@@ -5,6 +5,7 @@ using Rhino.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -46,10 +47,15 @@ namespace AreaAnalysis.Views
 
 
 
-            //creating the roomTable grid and adding the list of room objects as it's data store (source)
+            //creating the roomTable grid and adding the obsTable as it's main data store
             var roomTable = new GridView { AllowMultipleSelection = false };
-            
             roomTable.DataStore = mainStore;
+
+            //adding the columns
+            foreach (string header in mainStore[0])
+            {
+                EtoMethods.AddGridColumn(roomTable, );
+            }
 
             //handling the excel input
             var excelFilePath = new FilePicker();

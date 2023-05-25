@@ -17,7 +17,8 @@ namespace AreaAnalysis.Classes
     //This is intended to have the following lists:
     //00: Column Name
     //01: Editable
-    //02 --> onwards: values
+    //02: Type
+    //03 --> onwards: values
 
     public class ObservableTable<T> : ObservableCollection<BindingList<T>>
     {
@@ -67,7 +68,7 @@ namespace AreaAnalysis.Classes
         public ObservableTable<string> obsTable = new ObservableTable<string>();
 
         //the required header lists for the obstable:
-        private readonly List<string> headerList = new List<string> { "header", "editable" };
+        private readonly List<string> headerList = new List<string> { "header", "editable","type" };
 
 
         //constructor
@@ -89,8 +90,6 @@ namespace AreaAnalysis.Classes
                     doc.Strings.SetString(_stringSection, header, "");
                 }
             }
-
-            //populate the obsTable
 
         }
 
