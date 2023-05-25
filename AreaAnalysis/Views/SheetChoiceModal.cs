@@ -21,7 +21,7 @@ namespace AreaAnalysis.Views
         public SheetChoiceModal(FileInfo excelFileInfo)
         {
             // getting the sheet list
-            ExcelReader excelFile = new ExcelReader(excelFileInfo);
+            ExcelMethods excelFile = new ExcelMethods(excelFileInfo);
             List<string> sheetList = excelFile.GetSheetList();
 
 

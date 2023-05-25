@@ -14,14 +14,14 @@ using Rhino.Commands;
 
 namespace AreaAnalysis.Classes
 {
-    internal class ExcelReader
+    internal class ExcelMethods
     {
         public FileInfo InputExcel;
 
         private Worksheet _currentSheet;
 
         //constructor
-        public ExcelReader(FileInfo excelFile)
+        public ExcelMethods(FileInfo excelFile)
         {
             InputExcel = excelFile;
         }
@@ -52,7 +52,7 @@ namespace AreaAnalysis.Classes
         }
 
 
-        public List<List<string>> SetWorksheet(int sheetNo, bool hasHeader)
+        public List<List<string>> GetSheetInfo(int sheetNo, bool hasHeader)
         {
             using (FastExcelObj fastExcel = new FastExcelObj(InputExcel, true))
             {

@@ -23,7 +23,7 @@ namespace AreaAnalysis.Views
     [System.Runtime.InteropServices.Guid("29BA961F-A5C5-48D0-A352-11D1B7F336CF")]
     public class MainPluginPanel : Panel
     {
-        readonly uint m_document_sn = 0;
+        readonly uint _mDocumentSn = 0;
 
         /// <summary>
         /// Provide easy access to the SampleCsEtoPanel.GUID
@@ -35,19 +35,19 @@ namespace AreaAnalysis.Views
         /// </summary>
         public MainPluginPanel(uint documentSerialNumber)
         {
-
-            m_document_sn = documentSerialNumber;
-
+            //panel Rhino setup
+            _mDocumentSn = documentSerialNumber;
             Title = GetType().Name;
 
 
             //I should extract this out to make the datastore elsewhere.....
-            var roomList = RoomMethods.CreateEmptyRoomList(5);
-            var roomStore = new FilterCollection<Room>(roomList);
+            // YO =====>  var roomList = RoomMethods.CreateEmptyRoomList(5);
+            // YO =====> var roomStore = new FilterCollection<Room>(roomList);
 
             //creating the roomTable grid and adding the list of room objects as it's data store (source)
             var roomTable = new GridView { AllowMultipleSelection = false };
-            roomTable.DataStore = roomStore;
+            
+            // YO =====> roomTable.DataStore = roomStore;
 
             //handling the excel input
             var excelFilePath = new FilePicker();
@@ -62,7 +62,7 @@ namespace AreaAnalysis.Views
             hello_button.Click += (sender, e) => OnHelloButton(excelFilePath);
 
 
-
+            /*
             // adding the column cells and binding their inputs with the object's properties
             roomTable.Columns.Add(new GridColumn { 
                 DataCell = new TextBoxCell { Binding = Binding.Property<Room, string>(r => r.roomName) },
@@ -107,7 +107,7 @@ namespace AreaAnalysis.Views
                 AutoSize = true,
                 Editable = true
             });
-
+            */
 
             // laying out the panel
             var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
@@ -115,6 +115,8 @@ namespace AreaAnalysis.Views
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Excel Document" });
             layout.AddSeparateRow(excelFilePath, new Label{ Text = "---->"}, importExcel, null);
+            layout.AddSeparateRow(new EtoDivider());
+            layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
             layout.Add(roomTable, yscale: true);
             layout.Add(null);
             Content = layout;
@@ -174,12 +176,7 @@ namespace AreaAnalysis.Views
                 var sheetSelected = sheetChoiceDialog.GetSelectedSheet();
 
                 //aligning the excel to the Rhino columns
-                List<string> rhinoHeaders = new List<string>();
-                foreach (var rHeader in rTable.Columns)
-                {
-                    rhinoHeaders.Add(rHeader.HeaderText);
-                    Rhino.RhinoApp.WriteLine(rHeader.HeaderText);
-                }
+                var rhinoHeaders = EtoMethods.GetGridViewHeaders(rTable);
             }
         }
     }
