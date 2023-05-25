@@ -35,19 +35,21 @@ namespace AreaAnalysis.Views
         /// </summary>
         public MainPluginPanel(uint documentSerialNumber)
         {
-            //panel Rhino setup
+            //Rhino Panel Setup
             _mDocumentSn = documentSerialNumber;
             Title = GetType().Name;
 
+            // setting up the document table
+            UserDataTable dTable = new UserDataTable();
+            char forbiddenSeparator = dTable.GetSeparator(); //can't let the user use the defined separator
+            ObservableTable<string> mainStore = dTable.obsTable; 
 
-            //I should extract this out to make the datastore elsewhere.....
-            // YO =====>  var roomList = RoomMethods.CreateEmptyRoomList(5);
-            // YO =====> var roomStore = new FilterCollection<Room>(roomList);
+
 
             //creating the roomTable grid and adding the list of room objects as it's data store (source)
             var roomTable = new GridView { AllowMultipleSelection = false };
             
-            // YO =====> roomTable.DataStore = roomStore;
+            roomTable.DataStore = mainStore;
 
             //handling the excel input
             var excelFilePath = new FilePicker();
