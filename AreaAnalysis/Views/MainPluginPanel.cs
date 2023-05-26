@@ -18,6 +18,9 @@ using System.IO;
 using System.Runtime.Remoting.Channels;
 using FastExcel;
 using Microsoft.SqlServer.Server;
+using Rhino;
+using System.Collections.ObjectModel;
+using System.Dynamic;
 
 namespace AreaAnalysis.Views
 {
@@ -40,22 +43,66 @@ namespace AreaAnalysis.Views
             _mDocumentSn = documentSerialNumber;
             Title = GetType().Name;
 
+
+            // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
+
+            /*
             // setting up the document table
             UserDataTable dTable = new UserDataTable();
             char forbiddenSeparator = dTable.GetSeparator(); //can't let the user use the defined separator
             ObservableTable<string> mainStore = dTable.obsTable; 
 
-
-
             //creating the roomTable grid and adding the obsTable as it's main data store
             var roomTable = new GridView { AllowMultipleSelection = false };
             roomTable.DataStore = mainStore;
 
-            //adding the columns
-            foreach (string header in mainStore[0])
+            //Eto button to add column
+            var addColumnButton = new Button { Text = "Add Column to Table" };
+            addColumnButton.Click += (sender, e) => OnAddColumnButton();
+
+            */
+
+           
+
+            ObservableCollection<tableObject> mainStore = new ObservableCollection<tableObject>();
+
+            tableObject tO = new tableObject { floor = 1 };
+            mainStore.Add(tO);
+
+            mainStore.CollectionChanged += (sender, e) =>
             {
-                EtoMethods.AddGridColumn(roomTable, );
+                Rhino.RhinoApp.WriteLine("The collection changed!");
+            };
+
+
+            var roomTable = new GridView { AllowColumnReordering = true };
+            roomTable.DataStore = mainStore;
+
+
+            /*
+            void OnAddColumnButton()
+            {
+                BindingList<string> newCol = dTable.AddColumn("Room Name", true, false);
+
+                EtoMethods.AddColumntoGridView(roomTable, "Room Name", true, false, newCol);
+
             }
+            */
+
+
+            //TEST BUTTON ==============================================================================================================
+
+            var testButton = new Button { Text = "Test" };
+            testButton.Click += (sender, e) => OnTestButton();
+
+            void OnTestButton()
+            {
+                mainStore[0].floor = 3;
+            }
+
+
+
+            // EXCEL INPUT ==============================================================================================================
 
             //handling the excel input
             var excelFilePath = new FilePicker();
@@ -63,11 +110,21 @@ namespace AreaAnalysis.Views
             excelFilePath.Filters.Add(filter);
 
             var importExcel = new Button { Text = "Import Excel File" };
-            importExcel.Click += (sender, e) => OnExcelButton(excelFilePath, roomTable);
+            importExcel.Click += (sender, e) => OnExcelButton(excelFilePath);
 
-            //Eto buttons for the form
-            var hello_button = new Button { Text = "Hello..." };
-            hello_button.Click += (sender, e) => OnHelloButton(excelFilePath);
+            // PANEL LAYOUT ==============================================================================================================
+
+            var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
+            layout.AddSeparateRow(testButton, null);
+            layout.AddSeparateRow(new EtoDivider());
+            layout.AddSeparateRow(new Label { Text = "Excel Document" });
+            layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);
+            layout.AddSeparateRow(new EtoDivider());
+            layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
+            //layout.AddSeparateRow(addColumnButton, null);
+            layout.Add(roomTable, yscale: true);
+            layout.Add(null);
+            Content = layout;
 
 
             /*
@@ -116,18 +173,6 @@ namespace AreaAnalysis.Views
                 Editable = true
             });
             */
-
-            // laying out the panel
-            var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
-            layout.AddSeparateRow(hello_button, null);
-            layout.AddSeparateRow(new EtoDivider());
-            layout.AddSeparateRow(new Label { Text = "Excel Document" });
-            layout.AddSeparateRow(excelFilePath, new Label{ Text = "---->"}, importExcel, null);
-            layout.AddSeparateRow(new EtoDivider());
-            layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
-            layout.Add(roomTable, yscale: true);
-            layout.Add(null);
-            Content = layout;
         }
 
 
@@ -136,18 +181,10 @@ namespace AreaAnalysis.Views
         /// <summary>
         /// Example of proper way to display a message box
         /// </summary>
-        protected void OnHelloButton(FilePicker exFile)
-        {
-            // Use the Rhino common message box and NOT the Eto MessageBox,
-            // the Eto version expects a top level Eto Window as the owner for
-            // the MessageBox and will cause problems when running on the Mac.
-            // Since this panel is a child of some Rhino container it does not
-            // have a top level Eto Window.
-            Rhino.RhinoApp.WriteLine(exFile.FilePath);
-        }
 
 
-        protected void OnExcelButton(FilePicker exFile, GridView rTable)
+
+        protected void OnExcelButton(FilePicker exFile)
         {
             //crazy regex to match a valid file path
             Regex reggie = new Regex(@"^(?:[a-zA-Z]:|\\\\[a-zA-Z0-9_.$\]+)(?:\\[^\\/:*?""<>|]+)*\\?[^\\/:*?""<>|]*$");
@@ -182,9 +219,6 @@ namespace AreaAnalysis.Views
 
                 var headerBool = sheetChoiceDialog.HasHeader();
                 var sheetSelected = sheetChoiceDialog.GetSelectedSheet();
-
-                //aligning the excel to the Rhino columns
-                var rhinoHeaders = EtoMethods.GetGridViewHeaders(rTable);
             }
         }
     }

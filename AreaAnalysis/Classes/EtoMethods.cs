@@ -20,25 +20,19 @@ namespace AreaAnalysis.Classes
             return rhinoHeaders;
         }
 
-        public static void AddGridColumn(GridView rTable, BindingList<string> row, string colName, 
-        string editable, string type)
+        public static void AddColumntoGridView(GridView gView, string header, bool isEditable, bool isNumber, BindingList<string> col)
         {
-            if (type == "number")
+            if (isNumber)
             {
-                rTable.Columns.Add(new GridColumn
-                {
-                    DataCell = new TextBoxCell
-                    {
-                        Binding = new DelegateBinding<BindingList<string>, string>(
-                            r => r.curArea.ToString(),
-                            (r, v) => r.curArea = float.TryParse(v, out var result) ? result : r.curArea
-                        )
-                    },
-                    HeaderText = "Current Area",
-                    AutoSize = true,
-                    Editable = false
-                });
+                Rhino.RhinoApp.WriteLine("It's a number!");
+            }
+            else
+            {
+                GridColumn gColumn = new GridColumn();
+                gColumn.HeaderText = header;
+                gColumn.DataCell = new TextBoxCell("string");
             }
         }
+
     }
 }

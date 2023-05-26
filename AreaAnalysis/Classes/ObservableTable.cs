@@ -9,16 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Rhino;
 using Rhino.DocObjects;
+using Rhino.DocObjects.Tables;
 using Rhino.UI;
 
 namespace AreaAnalysis.Classes
 {
     //extending the ObservableCollection so that changes inside the lists are registered
-    //This is intended to have the following lists:
-    //00: Column Name
-    //01: Editable
-    //02: Type
-    //03 --> onwards: values
 
     public class ObservableTable<T> : ObservableCollection<BindingList<T>>
     {
@@ -57,40 +53,50 @@ namespace AreaAnalysis.Classes
 
     class UserDataTable
     {
-        // the Rhino UserData values
-        private readonly string _stringSection = "AARCAreaAnalysisTool"; //make sure we have a unique key
-        private readonly char _valueSeparator = '~';
-
         //The rhino doc
         private RhinoDoc doc = RhinoDoc.ActiveDoc;
 
-        // the plugin observableTable to keep track of the changes
+        // the Rhino UserData values
+        private readonly string _stringSection = "AARCAreaAnalysisTool"; //make sure we have a unique key
+        private readonly char _valueSeparator = '~';
+        private readonly string _stringSeperator = "~";
+        private readonly string _initStringTableKey = "active";
+
+        // the plugin observableTable to keep track of the changes ....
         public ObservableTable<string> obsTable = new ObservableTable<string>();
 
-        //the required header lists for the obstable:
-        private readonly List<string> headerList = new List<string> { "header", "editable","type" };
+        // ... and the corresponding column info lists for the observable table
+        public List<string> columnHeaders = new List<string>();
+        private List<bool> columnEditable = new List<bool>();
+        private List<bool> columnIsNumber = new List<bool>(); 
 
 
         //constructor
         public UserDataTable()
         {
-            //add the required headers to the obsTable
-            foreach (var _ in headerList)
-            {
-                obsTable.Add(new BindingList<string>());
-            }
 
             // check if the string section exists in the current document and setup if not
             var userSections = doc.Strings.GetSectionNames();
 
-            if (!userSections.Contains(_stringSection))
+            if (userSections.Contains(_stringSection) == false)
             {
-                foreach (var header in headerList)
-                {
-                    doc.Strings.SetString(_stringSection, header, "");
-                }
+                doc.Strings.SetString(_stringSection, _initStringTableKey, _stringSeperator) ; //add the init section to the stringtable
             }
 
+        }
+
+        public BindingList<string> AddColumn(string columnName, bool isEditable, bool isNumber)
+        {
+            //add the proper info to the column info lists and add a new empty list to the obsTable
+            columnHeaders.Add(columnName);
+            columnEditable.Add(isEditable);
+            columnIsNumber.Add(isNumber);
+
+            BindingList<string> newColumn = new BindingList<string>();
+
+            obsTable.Add(newColumn);
+
+            return newColumn;
         }
 
         private List<string> SplitEntryValues(string val)
