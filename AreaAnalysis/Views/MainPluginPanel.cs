@@ -46,58 +46,55 @@ namespace AreaAnalysis.Views
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
 
-            /*
-            // setting up the document table
-            UserDataTable dTable = new UserDataTable();
-            char forbiddenSeparator = dTable.GetSeparator(); //can't let the user use the defined separator
-            ObservableTable<string> mainStore = dTable.obsTable; 
 
-            //creating the roomTable grid and adding the obsTable as it's main data store
-            var roomTable = new GridView { AllowMultipleSelection = false };
+            DataTable mainStore = new DataTable();
+            var roomTable = new GridView { AllowColumnReordering = true };
             roomTable.DataStore = mainStore;
 
             //Eto button to add column
             var addColumnButton = new Button { Text = "Add Column to Table" };
             addColumnButton.Click += (sender, e) => OnAddColumnButton();
 
-            */
-
-           
-
-            ObservableCollection<tableObject> mainStore = new ObservableCollection<tableObject>();
-
-            tableObject tO = new tableObject { floor = 1 };
-            mainStore.Add(tO);
-
-            mainStore.CollectionChanged += (sender, e) =>
-            {
-                Rhino.RhinoApp.WriteLine("The collection changed!");
-            };
-
-
-            var roomTable = new GridView { AllowColumnReordering = true };
-            roomTable.DataStore = mainStore;
-
-
-            /*
             void OnAddColumnButton()
             {
-                BindingList<string> newCol = dTable.AddColumn("Room Name", true, false);
-
-                EtoMethods.AddColumntoGridView(roomTable, "Room Name", true, false, newCol);
+                roomTable.Columns.Add(new GridColumn
+                {
+                    DataCell = new TextBoxCell { Binding = Binding.Property<TableObject, string>(r => r.RoomName) },
+                    HeaderText = "Room Name",
+                    AutoSize = true,
+                    Editable = true
+                });
 
             }
-            */
 
 
             //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Test" };
+            var testButton = new Button { Text = "Get Object Values" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
             {
-                mainStore[0].floor = 3;
+                foreach (var obj in mainStore)
+                {
+                    RhinoApp.WriteLine(obj.RoomName);
+                }
+            }
+
+            var testButton2 = new Button { Text = "Add Table Object" };
+            testButton2.Click += (sender, e) => OnTestButton2();
+
+            void OnTestButton2()
+            {
+                mainStore.Add(new TableObject {RoomName = "test"});
+            }
+
+            var testButton3 = new Button { Text = "Change a table object" };
+            testButton3.Click += (sender, e) => OnTestButton3();
+
+            void OnTestButton3()
+            {
+                mainStore[0].RoomName = "coolio";
             }
 
 
@@ -115,12 +112,13 @@ namespace AreaAnalysis.Views
             // PANEL LAYOUT ==============================================================================================================
 
             var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
-            layout.AddSeparateRow(testButton, null);
+            layout.AddSeparateRow(testButton, testButton2, testButton3, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Excel Document" });
             layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
+            layout.AddSeparateRow(addColumnButton, null);
             //layout.AddSeparateRow(addColumnButton, null);
             layout.Add(roomTable, yscale: true);
             layout.Add(null);
