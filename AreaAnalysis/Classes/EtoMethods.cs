@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Eto.Forms;
+using Rhino;
 
 namespace AreaAnalysis.Classes
 {
@@ -20,18 +23,39 @@ namespace AreaAnalysis.Classes
             return rhinoHeaders;
         }
 
-        public static void AddColumntoGridView(GridView gView, string header, bool isEditable, bool isNumber, BindingList<string> col)
+        public static void AddColumn(GridView gView, string colName, PropertyInfo colProp, string colType)
         {
-            if (isNumber)
+            DelegateBinding<TableObject, string> tableBinding;
+
+            if (colType == "System.String")
             {
-                Rhino.RhinoApp.WriteLine("It's a number!");
+                tableBinding = new DelegateBinding<TableObject, string>(
+                    t => (string)colProp.GetValue(t),
+                    (t, value) => colProp.SetValue(t, value));
+            }
+            else if (colType == "System.Int32")
+            {
+                tableBinding = new DelegateBinding<TableObject, string>(
+                    t => colProp.GetValue(t).ToString(),
+                    (t, value) => colProp.SetValue(t, int.TryParse(value, out var result) 
+                        ? result : colProp.GetValue(t)));
             }
             else
             {
-                GridColumn gColumn = new GridColumn();
-                gColumn.HeaderText = header;
-                gColumn.DataCell = new TextBoxCell("string");
+                tableBinding = new DelegateBinding<TableObject, string>(
+                    t => colProp.GetValue(t).ToString(),
+                    (t, value) => colProp.SetValue(t, float.TryParse(value, out var result) 
+                        ? result : colProp.GetValue(t)));
+
             }
+
+            gView.Columns.Add(new GridColumn
+            {
+                DataCell = new TextBoxCell {Binding = tableBinding},
+                HeaderText = colName,
+                AutoSize = true,
+                Editable = true
+            });
         }
 
     }

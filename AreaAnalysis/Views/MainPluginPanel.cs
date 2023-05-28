@@ -20,7 +20,9 @@ using FastExcel;
 using Microsoft.SqlServer.Server;
 using Rhino;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Dynamic;
+using System.Reflection;
 
 namespace AreaAnalysis.Views
 {
@@ -57,14 +59,10 @@ namespace AreaAnalysis.Views
 
             void OnAddColumnButton()
             {
-                roomTable.Columns.Add(new GridColumn
-                {
-                    DataCell = new TextBoxCell { Binding = Binding.Property<TableObject, string>(r => r.RoomName) },
-                    HeaderText = "Room Name",
-                    AutoSize = true,
-                    Editable = true
-                });
-
+                var columnAddDialog = new ColumnAddModal();
+                columnAddDialog.ShowModal(this);
+                (string colName, PropertyInfo colProp, string colType) = columnAddDialog.GetColumnInfo();
+                EtoMethods.AddColumn(roomTable, colName, colProp,colType);
             }
 
 

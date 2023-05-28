@@ -11,7 +11,7 @@ using AreaAnalysis.Classes;
 
 namespace AreaAnalysis.Views
 {
-    class SheetChoiceModal : CommandDialog
+    class SheetChoiceModal : BaseModal
     {
         private CheckBox checkBox;
         private DropDown dropDownList;

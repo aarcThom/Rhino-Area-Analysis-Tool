@@ -17,23 +17,23 @@ namespace AreaAnalysis.Classes
     {
         // PROPERTIES =========================================================
         // string properties
-        private string _roomName;
-        private string _roomType;
-        private string _roomID;
+        private string _roomName = "undefined";
+        private string _roomType = "undefined";
+        private string _roomId = "undefined";
 
         // guid
-        private Guid _rhinoGUID;
+        private Guid _rhinoGuid;
 
         // dimensional properties
-        private float _currentArea;
-        private float _roomHeight;
+        private float _currentArea = 0;
+        private float _roomHeight = 0;
 
         // location properties
-        private int _floor;
-        private string _roomNumber;
+        private int _floor = 0;
+        private string _roomNumber = "undefined";
 
         // target properties
-        private float _targetArea;
+        private float _targetArea = 0;
 
         // PROPERTY CHANGE NOTIFICATION IMPLEMENTATION =============================
         public event PropertyChangedEventHandler PropertyChanged;
@@ -61,20 +61,20 @@ namespace AreaAnalysis.Classes
 
         public string RoomId
         {
-            get => _roomID;
+            get => _roomId;
             set
             {
-                _roomID = value;
+                _roomId = value;
                 OnPropertyChanged();
             }
         }
 
         public Guid RhinoGuid
         {
-            get => _rhinoGUID;
+            get => _rhinoGuid;
             set
             {
-                _rhinoGUID = value;
+                _rhinoGuid = value;
                 OnPropertyChanged();
             }
         }
