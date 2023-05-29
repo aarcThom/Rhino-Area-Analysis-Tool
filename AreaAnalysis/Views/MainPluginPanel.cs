@@ -62,7 +62,13 @@ namespace AreaAnalysis.Views
                 var columnAddDialog = new ColumnAddModal();
                 columnAddDialog.ShowModal(this);
                 (string colName, PropertyInfo colProp, string colType) = columnAddDialog.GetColumnInfo();
-                EtoMethods.AddColumn(roomTable, colName, colProp,colType);
+
+                //add column if not null
+                if (colName != null && colProp != null && colType != null)
+                {
+                    EtoMethods.AddColumn(roomTable, colName, colProp, colType);
+                }
+
             }
 
 
@@ -122,53 +128,6 @@ namespace AreaAnalysis.Views
             layout.Add(null);
             Content = layout;
 
-
-            /*
-            // adding the column cells and binding their inputs with the object's properties
-            roomTable.Columns.Add(new GridColumn { 
-                DataCell = new TextBoxCell { Binding = Binding.Property<Room, string>(r => r.roomName) },
-                HeaderText = "Room Name", AutoSize = true, Editable = true});
-
-            // we need to create a custom binding to convert back and forth between numbers and text
-            roomTable.Columns.Add(new GridColumn { 
-                DataCell = new TextBoxCell { Binding = Binding.Property<Room, string>(r => r.roomType) },
-                HeaderText = "Program Type", AutoSize = true, Editable = true });
-
-            roomTable.Columns.Add(new GridColumn {
-                DataCell = new TextBoxCell { Binding = new DelegateBinding<Room, string>(
-                        r => r.curArea.ToString(),
-                        (r, v) => r.curArea = float.TryParse(v, out var result) ? result : r.curArea
-                    ) }, 
-                HeaderText = "Current Area",
-                AutoSize = true, 
-                Editable = false });
-
-            roomTable.Columns.Add(new GridColumn {
-                DataCell = new TextBoxCell
-                {
-                    Binding = new DelegateBinding<Room, string>(
-                        r => r.reqArea.ToString(),
-                        (r, v) => r.reqArea = float.TryParse(v, out var result) ? result : r.reqArea
-                    )
-                },
-                HeaderText = "Required Area",
-                AutoSize = true,
-                Editable = true
-            });
-
-            roomTable.Columns.Add(new GridColumn {
-                DataCell = new TextBoxCell
-                {
-                    Binding = new DelegateBinding<Room, string>(
-                        r => r.floor.ToString(),
-                        (r, v) => r.floor = int.TryParse(v, out var result) ? result : r.floor
-                    )
-                },
-                HeaderText = "Floor",
-                AutoSize = true,
-                Editable = true
-            });
-            */
         }
 
 

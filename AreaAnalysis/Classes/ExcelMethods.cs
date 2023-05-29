@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using FastExcel;
 using FastExcelObj = FastExcel.FastExcel;
 using Rhino.UI;
-using Rhino.Commands;
 
 namespace AreaAnalysis.Classes
 {

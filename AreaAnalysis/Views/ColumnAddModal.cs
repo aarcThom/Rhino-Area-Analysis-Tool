@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-using Eto.Drawing;
 using Eto.Forms;
 using AreaAnalysis.Classes;
-using Rhino.UI.Forms;
 using System.Text.RegularExpressions;
-using Rhino;
 
 namespace AreaAnalysis.Views
 {
@@ -24,19 +17,14 @@ namespace AreaAnalysis.Views
 
         public ColumnAddModal()
         {
+            //Setting the modal title
+            Title = "Add a column";
+
             // getting the TableObject Properties
             (List<string> tableTypes, List<string> tableNames, 
                 List<PropertyInfo> tableRawProps) = FormatProperties();
 
-
-
-            //setting up the modal
-            Padding = new Padding(10);
-            Title = "Choose what kind of column you want to add";
-            Resizable = false;
-
-
-            //create the dropdown list
+            //create the dropdown list and label
             _dropDownList = new DropDown();
             foreach (string name in tableNames)
             {
@@ -44,24 +32,33 @@ namespace AreaAnalysis.Views
             }
             _dropDownList.SelectedIndex = 0;
 
-            Content = new StackLayout()
-            {
-                Padding = new Padding(0),
-                Spacing = 6,
-                Items =
-                {
-                    new Label { Text = "What sort of column do you want to add?" },
-                    _dropDownList
-                }
-            };
+            //closing event for dropdown
+            _dropDownList.DropDownClosed += (sender, args) => DropDown_Closed(tableNames, tableRawProps, tableTypes );
+            //opening event for dropdown
+            _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(tableNames, tableRawProps, tableTypes);
 
-            //handling the closing event
-            Closed += (sender, e) => SheetChoiceModal_Closed(tableNames, tableRawProps, tableTypes);
+            Label dropLabel = new Label { Text = "What sort of column do you want to add?" };
+
+            // adding the dropdown to the layout
+            ModalLayout.Items.Insert(0,dropLabel);
+            ModalLayout.Items.Insert(1, _dropDownList);
+
         }
 
+        // get the info
         public (string, PropertyInfo, string) GetColumnInfo() => (_selectedEnglishName, _selectedProp, _selectedType);
 
-        private void SheetChoiceModal_Closed(List<string> names, List<PropertyInfo> props, List<string> tTypes)
+        //wiping return info if cancelled
+        protected override void OnCancelButtonClicked()
+        {
+            _selectedType = null;
+            _selectedProp = null;
+            _selectedType = null;
+
+            base.OnCancelButtonClicked();
+        }
+
+        private void DropDown_Closed(List<string> names, List<PropertyInfo> props, List<string> tTypes)
         {
             int choiceIndex = _dropDownList.SelectedIndex;
 

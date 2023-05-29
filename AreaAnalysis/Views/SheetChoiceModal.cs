@@ -1,75 +1,71 @@
-﻿using Eto.Drawing;
-using Eto.Forms;
-using Rhino.UI.Forms;
-using System;
+﻿using Eto.Forms;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AreaAnalysis.Classes;
 
 namespace AreaAnalysis.Views
 {
     class SheetChoiceModal : BaseModal
     {
-        private CheckBox checkBox;
-        private DropDown dropDownList;
-        private int selectedOption = 0;
+        private readonly CheckBox _checkBox;
+        private readonly DropDown _dropDownList;
+        private int _selectedOption = 0;
 
 
         public SheetChoiceModal(FileInfo excelFileInfo)
         {
+            //Modal title
+            Title = "Choose your Excel Sheet";
+
             // getting the sheet list
             ExcelMethods excelFile = new ExcelMethods(excelFileInfo);
             List<string> sheetList = excelFile.GetSheetList();
 
 
-            //setting up the modal
-            Padding = new Padding(10);
-            Title = "Choose your Excel Sheet";
-            Resizable = false;
-
             // Create the checkbox
-            checkBox = new CheckBox { Text = "Does the Sheet have a header?" };
+            _checkBox = new CheckBox { Text = "Does the Sheet have a header?" };
 
             //create the dropdown list
-            dropDownList = new DropDown();
+            _dropDownList = new DropDown();
             foreach (var sheet in sheetList)
             {
-                dropDownList.Items.Add(sheet);
+                _dropDownList.Items.Add(sheet);
             }
-            dropDownList.SelectedIndex = 0;
+            _dropDownList.SelectedIndex = 0;
+            
+            //adding the dropdown events
+            _dropDownList.DropDownClosed += (sender, e) => SheetChoice();
+            _dropDownList.LoadComplete += (sender, e) => SheetChoice();
 
-            Content = new StackLayout()
-            {
-                Padding = new Padding(0),
-                Spacing = 6,
-                Items =
-                {
-                  new Label { Text="Please choose what excel worksheet you want to reference from " + excelFileInfo.Name },
-                  dropDownList,
-                  checkBox
-                }
-            };
+            //add objects to modal
+            Label dropLabel = new Label
+                { Text = "Please choose what excel worksheet you want to reference from " + excelFileInfo.Name };
+            ModalLayout.Items.Insert(0, dropLabel);
+            ModalLayout.Items.Insert(1, _checkBox);
+            ModalLayout.Items.Insert(1, _dropDownList);
 
-            //handling the closing event
-            Closed += SheetChoiceModal_Closed;
         }
 
-        private void SheetChoiceModal_Closed(object sender, EventArgs e)
+        //resetting the selected value if canceled
+        protected override void OnCancelButtonClicked()
         {
-            selectedOption = dropDownList.SelectedIndex + 1; //need to add one as excel starts numbering at 1...
+            _selectedOption = 0;
+            base.OnCancelButtonClicked();
+        }
+
+        private void SheetChoice()
+        {
+            _selectedOption = _dropDownList.SelectedIndex + 1; //need to add one as excel starts numbering at 1...
         }
 
         public int GetSelectedSheet()
         {
-            return selectedOption;
+            return _selectedOption;
         }
 
         public bool HasHeader()
         {
-            return checkBox.Checked ?? false;
+            return _checkBox.Checked ?? false;
         }
 
 
