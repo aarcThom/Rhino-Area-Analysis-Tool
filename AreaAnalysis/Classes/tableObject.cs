@@ -27,7 +27,7 @@ namespace AreaAnalysis.Classes
         private readonly string _numericalFieldDesc =
             "Use this field type to a non-tracked numerical value like room number, cost, etc.";
 
-        //CONSTRUCTOR ========================================================================================
+        // CONSTRUCTOR ========================================================================================
         public TableObject()
         {
             SubscribeToPropertyChanged(nameof(TextField));
@@ -35,9 +35,8 @@ namespace AreaAnalysis.Classes
         }
 
 
-        //GETTERS SETTERS W/ PROPERTY CHANGE =================================================================
+        // PROPERTIES =================================================================
 
-        // Text descriptors-----------------------------------------------------
         public FieldDict<string, string> TextField
         {
             get => _textField;
@@ -51,12 +50,11 @@ namespace AreaAnalysis.Classes
         }
 
 
-        //WILD EVENT SUBSCRIPTION THAT NEEDS TO BE DONE FOR EVERY DICTIONARY! =================================
+        // WILD EVENT SUBSCRIPTION THAT NEEDS TO BE DONE FOR EVERY DICTIONARY! =================================
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName = null)
         {
-            Rhino.RhinoApp.WriteLine("THE PROPERTY CHANGED!!!");
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -93,7 +91,7 @@ namespace AreaAnalysis.Classes
             OnPropertyChanged(propertyName);
         }
 
-        //Splitting out the properties and property names ======================================================
+        // PUBLIC METHODS ======================================================
         public List<string> GetFieldsNames()
         {
             List<string> fieldNames = new List<string>();
@@ -116,6 +114,8 @@ namespace AreaAnalysis.Classes
             }
             return fieldDescs;
         }
+
+        // PRIVATE METHODS ======================================================
 
         private List<string> GetProperties()
         {

@@ -49,6 +49,7 @@ namespace AreaAnalysis.Views
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
             TableObject test = new TableObject();
+            test.TextField.Add("hello","jello");
 
             DataTable mainStore = new DataTable();
             var roomTable = new GridView { AllowColumnReordering = true };
@@ -107,7 +108,7 @@ namespace AreaAnalysis.Views
 
             void OnTestButton3()
             {
-                test.TextField.Add("hello","jello");
+                test.TextField["hello"] = "hola";
             }
 
 

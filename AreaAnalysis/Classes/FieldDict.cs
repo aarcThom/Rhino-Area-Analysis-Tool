@@ -17,8 +17,21 @@ namespace AreaAnalysis.Classes
             get => base[key];
             set
             {
-                base[key] = value;
-                OnPropertyChanged($"[{key}]");
+                // raise change event on value change
+                if (base.ContainsKey(key))
+                {
+                    TValue oldValue = base[key];
+                    if (!EqualityComparer<TValue>.Default.Equals(oldValue, value))
+                    {
+                        base[key] = value;
+                        OnPropertyChanged(key.ToString());
+                    }
+                }
+                else
+                {
+                    base[key] = value;
+                    OnPropertyChanged(key.ToString());
+                }
             }
         }
 
