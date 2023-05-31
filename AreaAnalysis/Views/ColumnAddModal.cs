@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using Eto.Forms;
 using AreaAnalysis.Classes;
 using System.Text.RegularExpressions;
@@ -10,11 +11,13 @@ namespace AreaAnalysis.Views
     internal class ColumnAddModal : BaseModal
     {
         private readonly DropDown _dropDownList;
-        private TextArea _dropDesc = new TextArea();
+        private readonly TextArea _dropDesc = new TextArea();
+
+        private readonly TextBox _userNameBox = new TextBox();
 
         private string _chosenFieldName;
         private string _chosenUserName;
-        private TableObject _tableObject = new TableObject();
+        private readonly TableObject _tableObject = new TableObject();
 
 
         public ColumnAddModal()
@@ -45,10 +48,19 @@ namespace AreaAnalysis.Views
             _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(fieldNames, fieldDescriptions);
 
 
+            //adding the text field for the user name and label
+            Label userNameLabel = new Label { Text = "Choose a name for the column" };
+            _userNameBox.PlaceholderText = "Column name";
+
+            //event for username box
+            _userNameBox.TextChanged += (sender, args) => TextBoxChanged();
+
             // adding the dropdown to the layout
             ModalLayout.Items.Insert(0, dropLabel);
             ModalLayout.Items.Insert(1, _dropDownList);
             ModalLayout.Items.Insert(2, _dropDesc);
+            ModalLayout.Items.Insert(3, userNameLabel);
+            ModalLayout.Items.Insert(4, _userNameBox);
 
         }
 
@@ -64,6 +76,21 @@ namespace AreaAnalysis.Views
             base.OnCancelButtonClicked();
         }
 
+        // need to provide a column name
+        protected override void OnOKButtonClicked()
+        {
+            if (_userNameBox.Text == "")
+            {
+                WarningMessageModal warning = new WarningMessageModal("You must define column name",
+                    "Empty column name");
+                warning.ShowModal(this);
+            }
+            else
+            {
+                base.OnOKButtonClicked();
+            }
+        }
+
         private void DropDown_Closed(List<string> fNames, List<string> fDescriptions)
         {
             int choiceIndex = _dropDownList.SelectedIndex;
@@ -71,6 +98,11 @@ namespace AreaAnalysis.Views
             _chosenFieldName = fNames[choiceIndex];
             _dropDesc.Text = fDescriptions[choiceIndex];
 
+        }
+
+        private void TextBoxChanged()
+        {
+            _chosenUserName = _userNameBox.Text;
         }
     }
 }

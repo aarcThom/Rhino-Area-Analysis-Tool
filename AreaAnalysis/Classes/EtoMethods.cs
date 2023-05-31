@@ -23,36 +23,62 @@ namespace AreaAnalysis.Classes
             return rhinoHeaders;
         }
 
-        public static void AddColumn(GridView gView, string colName, PropertyInfo colProp, string colType)
+        public static void AddColumn(GridView gView, Type columnType, string userKey)
         {
             DelegateBinding<TableObject, string> tableBinding;
 
-            if (colType == "System.String")
+            
+            if (columnType == typeof(string))
             {
+            
+                RhinoApp.WriteLine("breakpoint!");
                 tableBinding = new DelegateBinding<TableObject, string>(
-                    t => (string)colProp.GetValue(t),
-                    (t, value) => colProp.SetValue(t, value));
+                    binding => binding.TextField[userKey],
+                    (binding, value) =>
+                    {
+                        binding.TextField[userKey] = value;
+                    });
             }
-            else if (colType == "System.Int32")
+            
+            
+            else if (columnType == typeof(int))
             {
                 tableBinding = new DelegateBinding<TableObject, string>(
-                    t => colProp.GetValue(t).ToString(),
-                    (t, value) => colProp.SetValue(t, int.TryParse(value, out var result) 
-                        ? result : colProp.GetValue(t)));
+                    binding => binding.IntegerField[userKey].ToString(),
+                    (binding, value) =>
+                    {
+                        if (int.TryParse(value, out int intValue))
+                        {
+                            binding.IntegerField[userKey] = intValue;
+                        }
+                        else
+                        {
+                            binding.IntegerField[userKey] = binding.IntegerField[userKey];
+                        }
+                    });
             }
-            else
+            else // if (colProp == typeof(float))
             {
                 tableBinding = new DelegateBinding<TableObject, string>(
-                    t => colProp.GetValue(t).ToString(),
-                    (t, value) => colProp.SetValue(t, float.TryParse(value, out var result) 
-                        ? result : colProp.GetValue(t)));
+                    binding => binding.NumberField[userKey].ToString(),
+                    (binding, value) =>
+                    {
+                        if (float.TryParse(value, out float floatValue))
+                        {
+                            binding.NumberField[userKey] = floatValue;
+                        }
+                        else
+                        {
+                            binding.NumberField[userKey] = binding.NumberField[userKey];
+                        }
+                    });
 
             }
 
             gView.Columns.Add(new GridColumn
             {
                 DataCell = new TextBoxCell {Binding = tableBinding},
-                HeaderText = colName,
+                HeaderText = userKey,
                 AutoSize = true,
                 Editable = true
             });

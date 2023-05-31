@@ -22,16 +22,72 @@ namespace AreaAnalysis.Classes
         private FieldDict<string, string> _textField = new FieldDict<string, string>();
         private  readonly string _textFieldDesc =
             "Use this field type to name a room, give a room a unique ID, etc.";
+        public readonly string TextFieldDefault = "undefined";
+        //static field to propagate to all classes
+        private static List<string> _textFieldKeys = new List<string>();
 
-        private FieldDict<string, float> _numericalField = new FieldDict<string, float>();
-        private readonly string _numericalFieldDesc =
-            "Use this field type to a non-tracked numerical value like room number, cost, etc.";
+        private FieldDict<string, int> _integerField = new FieldDict<string, int>();
+        private readonly string _integerFieldDesc =
+            "Use this field type to a non-tracked numerical integer values like room numbers";
+        public readonly int IntegerFieldDefault = 0;
+        //static field to propagate to all classes
+        private static List<string> _integerFieldKeys = new List<string>();
+
+
+        private FieldDict<string, float> _numberField = new FieldDict<string, float>();
+        private readonly string _numberFieldDesc =
+            "Use this field type to a non-tracked numerical floating point values like cost, area targets";
+        public readonly float NumberFieldDefault = 0f;
+        //static field to propagate to all classes
+        private static List<string> _numberFieldKeys = new List<string>();
+
 
         // CONSTRUCTOR ========================================================================================
-        public TableObject()
+        public TableObject(Type type = null, string userKey = "")
         {
+
+            // add existing keys to new instance
+            foreach (var key in _textFieldKeys)
+            {
+                _textField.Add(key, TextFieldDefault);
+            }
+
+            foreach (var key in _integerFieldKeys)
+            {
+                _integerField.Add(key, IntegerFieldDefault);
+            }
+
+            foreach (var key in _numberFieldKeys)
+            {
+                _numberField.Add(key, NumberFieldDefault);
+            }
+
+            // adding new keys to new instance
+            if (type != null && userKey != "")
+            {
+                if (type == typeof(string))
+                {
+                    _textFieldKeys.Add(userKey); // add to all future instances
+                    _textField.Add(userKey, TextFieldDefault);
+                } 
+                else if (type == typeof(int))
+                {
+                    _integerFieldKeys.Add(userKey); // add to all future instances
+                    _integerField.Add(userKey, IntegerFieldDefault);
+                }
+                else // if (type = typeof(float))
+                {
+                    _numberFieldKeys.Add(userKey); // add to all future instances
+                    _numberField.Add(userKey, NumberFieldDefault);
+                }
+
+                //NOTE: REMEMBER TO ADD NEW FIELDS TO AddNewField() AS WELL!!!
+            }
+
+            // subscribe to change events
             SubscribeToPropertyChanged(nameof(TextField));
-            SubscribeToPropertyChanged(nameof(NumericalField));
+            SubscribeToPropertyChanged(nameof(IntegerField));
+            SubscribeToPropertyChanged(nameof(NumberField));
         }
 
 
@@ -43,10 +99,16 @@ namespace AreaAnalysis.Classes
             set => SetPropertyValue(ref _textField, value, nameof(TextField));
         }
 
-        public FieldDict<string, float> NumericalField
+        public FieldDict<string, int> IntegerField
         {
-            get => _numericalField;
-            set => SetPropertyValue(ref _numericalField, value, nameof(_numericalField));
+            get => _integerField;
+            set => SetPropertyValue(ref _integerField, value, nameof(_integerField));
+        }
+
+        public FieldDict<string, float> NumberField
+        {
+            get => _numberField;
+            set => SetPropertyValue(ref _numberField, value, nameof(_numberField));
         }
 
 
@@ -113,6 +175,22 @@ namespace AreaAnalysis.Classes
                 fieldDescs.Add(GetPropValue(propName));
             }
             return fieldDescs;
+        }
+
+        public void AddNewField(Type type, string userKey)
+        {
+            if (type == typeof(string))
+            {
+                _textField.Add(userKey, TextFieldDefault);
+            }
+            else if (type == typeof(int))
+            {
+                _integerField.Add(userKey, IntegerFieldDefault);
+            }
+            else // if (type = typeof(float))
+            {
+                _numberField.Add(userKey, NumberFieldDefault);
+            }
         }
 
         // PRIVATE METHODS ======================================================

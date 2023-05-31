@@ -48,15 +48,18 @@ namespace AreaAnalysis.Views
 
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
-            TableObject test = new TableObject();
-            test.TextField.Add("hello","jello");
 
             DataTable mainStore = new DataTable();
+            
+            //linking the eto grid view
             var roomTable = new GridView { AllowColumnReordering = true };
             roomTable.DataStore = mainStore;
 
             // data table display settings
             roomTable.GridLines = GridLines.Both;
+
+            //initializing the data controller
+            TableController tableController = new TableController(mainStore, this, roomTable);
 
             //Eto button to add column
             var addColumnButton = new Button { Text = "Add Column to Table" };
@@ -81,25 +84,22 @@ namespace AreaAnalysis.Views
 
             //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Get Object Descriptios" };
+            var testButton = new Button { Text = "Test Controller" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
             {
-                foreach (var yo in test.GetFieldsDescriptions())
-                {
-                    RhinoApp.WriteLine(yo);
-                }
+                tableController.AddColumn();
             }
 
-            var testButton2 = new Button { Text = "Get Object field names" };
+            var testButton2 = new Button { Text = "Print Objects" };
             testButton2.Click += (sender, e) => OnTestButton2();
 
             void OnTestButton2()
             {
-                foreach (var yo in test.GetFieldsNames())
+                foreach (var obj in mainStore)
                 {
-                    RhinoApp.WriteLine(yo);
+                    RhinoApp.WriteLine(obj.IntegerField["hello"].ToString());
                 }
             }
 
@@ -108,7 +108,10 @@ namespace AreaAnalysis.Views
 
             void OnTestButton3()
             {
-                test.TextField["hello"] = "hola";
+                foreach (var obj in mainStore)
+                {
+                    obj.IntegerField["hello"] = 2;
+                }
             }
 
 

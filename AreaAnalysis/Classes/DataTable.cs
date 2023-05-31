@@ -41,6 +41,13 @@ namespace AreaAnalysis.Classes
             base.InsertItem(index, item);
         }
 
+        public new void Add(TableObject item)
+        {
+            // Subscribe to property change event of the new item before adding it into the collection
+            item.PropertyChanged += TableObject_PropertyChanged;
+            base.Add(item);
+        }
+
         protected override void RemoveItem(int index)
         {
             // Unsubscribe from property change event of the item being removed
