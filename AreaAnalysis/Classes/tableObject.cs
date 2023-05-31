@@ -17,49 +17,80 @@ namespace AreaAnalysis.Classes
 {
     public class TableObject : INotifyPropertyChanged
     {
-        // PROPERTIES ======================================================================================
+        // FIELDS ======================================================================================
 
-        private Dictionary<string, string> _textField;
+        private FieldDict<string, string> _textField = new FieldDict<string, string>();
         private  readonly string _textFieldDesc =
             "Use this field type to name a room, give a room a unique ID, etc.";
 
-        private Dictionary<string, string> _numericalField;
+        private FieldDict<string, float> _numericalField = new FieldDict<string, float>();
         private readonly string _numericalFieldDesc =
             "Use this field type to a non-tracked numerical value like room number, cost, etc.";
 
-
-        // PROPERTY CHANGE NOTIFICATION IMPLEMENTATION =======================================================
-        public event PropertyChangedEventHandler PropertyChanged;
+        //CONSTRUCTOR ========================================================================================
+        public TableObject()
+        {
+            SubscribeToPropertyChanged(nameof(TextField));
+            SubscribeToPropertyChanged(nameof(NumericalField));
+        }
 
 
         //GETTERS SETTERS W/ PROPERTY CHANGE =================================================================
 
         // Text descriptors-----------------------------------------------------
-        public Dictionary<string, string> TextField
+        public FieldDict<string, string> TextField
         {
             get => _textField;
-            set
-            {
-                _textField = value;
-                OnPropertyChanged();
-            }
+            set => SetPropertyValue(ref _textField, value, nameof(TextField));
         }
 
-        public Dictionary<string, string> NumericalField
+        public FieldDict<string, float> NumericalField
         {
             get => _numericalField;
-            set
-            {
-                _numericalField = value;
-                OnPropertyChanged();
-            }
+            set => SetPropertyValue(ref _numericalField, value, nameof(_numericalField));
         }
 
 
-        //Property change method to raise the event ===========================================================
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        //WILD EVENT SUBSCRIPTION THAT NEEDS TO BE DONE FOR EVERY DICTIONARY! =================================
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            Rhino.RhinoApp.WriteLine("THE PROPERTY CHANGED!!!");
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void SubscribeToPropertyChanged(string propertyName)
+        {
+            var propertyInfo = GetType().GetProperty(propertyName);
+            var observableObject = propertyInfo.GetValue(this) as INotifyPropertyChanged;
+            observableObject.PropertyChanged += PropertyChangedEventHandler;
+        }
+
+        private void UnsubscribeFromPropertyChanged(string propertyName)
+        {
+            var propertyInfo = GetType().GetProperty(propertyName);
+            var observableObject = propertyInfo.GetValue(this) as INotifyPropertyChanged;
+            observableObject.PropertyChanged -= PropertyChangedEventHandler;
+        }
+
+        private void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
+        }
+
+        private void SetPropertyValue<T>(ref T field, T value, string propertyName)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return;
+
+            UnsubscribeFromPropertyChanged(propertyName);
+
+            field = value;
+
+            SubscribeToPropertyChanged(propertyName);
+
+            OnPropertyChanged(propertyName);
         }
 
         //Splitting out the properties and property names ======================================================

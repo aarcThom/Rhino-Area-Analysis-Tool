@@ -107,7 +107,7 @@ namespace AreaAnalysis.Views
 
             void OnTestButton3()
             {
-                // mainStore[0].RoomName = "coolio";
+                test.TextField.Add("hello","jello");
             }
 
 
