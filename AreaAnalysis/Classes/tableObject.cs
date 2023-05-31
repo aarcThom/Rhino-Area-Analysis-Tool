@@ -9,131 +9,118 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Rhino;
 
 namespace AreaAnalysis.Classes
 {
     public class TableObject : INotifyPropertyChanged
     {
-        // PROPERTIES =========================================================
-        // string properties
-        private string _roomName = "undefined";
-        private string _roomType = "undefined";
-        private string _roomId = "undefined";
+        // PROPERTIES ======================================================================================
 
-        // guid
-        private Guid _rhinoGuid;
+        private Dictionary<string, string> _textField;
+        private  readonly string _textFieldDesc =
+            "Use this field type to name a room, give a room a unique ID, etc.";
 
-        // dimensional properties
-        private float _currentArea = 0;
-        private float _roomHeight = 0;
+        private Dictionary<string, string> _numericalField;
+        private readonly string _numericalFieldDesc =
+            "Use this field type to a non-tracked numerical value like room number, cost, etc.";
 
-        // location properties
-        private int _floor = 0;
-        private string _roomNumber = "undefined";
 
-        // target properties
-        private float _targetArea = 0;
-
-        // PROPERTY CHANGE NOTIFICATION IMPLEMENTATION =============================
+        // PROPERTY CHANGE NOTIFICATION IMPLEMENTATION =======================================================
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //GETTERS SETTERS W/ PROPERTY CHANGE
-        public string RoomName
+
+        //GETTERS SETTERS W/ PROPERTY CHANGE =================================================================
+
+        // Text descriptors-----------------------------------------------------
+        public Dictionary<string, string> TextField
         {
-            get => _roomName;
+            get => _textField;
             set
             {
-                _roomName = value;
+                _textField = value;
                 OnPropertyChanged();
             }
         }
 
-        public string RoomType
+        public Dictionary<string, string> NumericalField
         {
-            get => _roomType;
+            get => _numericalField;
             set
             {
-                _roomType = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string RoomId
-        {
-            get => _roomId;
-            set
-            {
-                _roomId = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Guid RhinoGuid
-        {
-            get => _rhinoGuid;
-            set
-            {
-                _rhinoGuid = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public float CurrentArea
-        {
-            get => _currentArea;
-            set
-            {
-                _currentArea = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public float RoomHeight
-        {
-            get => _roomHeight;
-            set
-            {
-                _roomHeight = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int Floor
-        {
-            get => _floor;
-            set
-            {
-                _floor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string RoomNumber
-        {
-            get => _roomNumber;
-            set
-            {
-                _roomNumber = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public float TargetArea
-        {
-            get => _targetArea;
-            set
-            {
-                _targetArea = value;
+                _numericalField = value;
                 OnPropertyChanged();
             }
         }
 
 
-        //Property change method to raise the event ========================================
+        //Property change method to raise the event ===========================================================
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        //Splitting out the properties and property names ======================================================
+        public List<string> GetFieldsNames()
+        {
+            List<string> fieldNames = new List<string>();
+
+            foreach (var prop in GetProperties())
+            {
+                fieldNames.Add(FormatFieldNames(prop));
+            }
+            return fieldNames;
+        }
+
+        public List<string> GetFieldsDescriptions()
+        {
+            List<string> fieldDescs = new List<string>();
+
+            foreach (var prop in GetProperties())
+            {
+                string propName = FormatFieldDescs(prop);
+                fieldDescs.Add(GetPropValue(propName));
+            }
+            return fieldDescs;
+        }
+
+        private List<string> GetProperties()
+        {
+            Type tableType = typeof(TableObject);
+            PropertyInfo[] tableProps = tableType.GetProperties();
+
+            List<string> propNames = new List<string>();
+
+            foreach (var name in tableProps)
+            {
+                propNames.Add(name.Name);
+            }
+
+            return propNames;
+        }
+
+        public static string FormatFieldNames(string prop)
+        {
+            string pattern = @"(?<!^)(?=[A-Z])";
+            string[] words = Regex.Split(prop, pattern);
+            return string.Join(" ", words);
+        }
+
+        private string FormatFieldDescs(string prop)
+        {
+            return "_" + char.ToLower(prop[0]) + prop.Substring(1) + "Desc";
+        }
+
+        private string GetPropValue(string propName)
+        {
+            Type tableType = typeof(TableObject);
+            FieldInfo fieldInfo = tableType.GetField(propName, 
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            return fieldInfo.GetValue(this).ToString();
+        }
+
     }
 }

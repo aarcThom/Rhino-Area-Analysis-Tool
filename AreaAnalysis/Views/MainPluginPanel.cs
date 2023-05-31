@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Dynamic;
 using System.Reflection;
+using Color = Eto.Drawing.Color;
 
 namespace AreaAnalysis.Views
 {
@@ -47,11 +48,14 @@ namespace AreaAnalysis.Views
 
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
-
+            TableObject test = new TableObject();
 
             DataTable mainStore = new DataTable();
             var roomTable = new GridView { AllowColumnReordering = true };
             roomTable.DataStore = mainStore;
+
+            // data table display settings
+            roomTable.GridLines = GridLines.Both;
 
             //Eto button to add column
             var addColumnButton = new Button { Text = "Add Column to Table" };
@@ -61,6 +65,7 @@ namespace AreaAnalysis.Views
             {
                 var columnAddDialog = new ColumnAddModal();
                 columnAddDialog.ShowModal(this);
+                /*
                 (string colName, PropertyInfo colProp, string colType) = columnAddDialog.GetColumnInfo();
 
                 //add column if not null
@@ -68,29 +73,33 @@ namespace AreaAnalysis.Views
                 {
                     EtoMethods.AddColumn(roomTable, colName, colProp, colType);
                 }
+                */
 
             }
 
 
             //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Get Object Values" };
+            var testButton = new Button { Text = "Get Object Descriptios" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
             {
-                foreach (var obj in mainStore)
+                foreach (var yo in test.GetFieldsDescriptions())
                 {
-                    RhinoApp.WriteLine(obj.RoomName);
+                    RhinoApp.WriteLine(yo);
                 }
             }
 
-            var testButton2 = new Button { Text = "Add Table Object" };
+            var testButton2 = new Button { Text = "Get Object field names" };
             testButton2.Click += (sender, e) => OnTestButton2();
 
             void OnTestButton2()
             {
-                mainStore.Add(new TableObject {RoomName = "test"});
+                foreach (var yo in test.GetFieldsNames())
+                {
+                    RhinoApp.WriteLine(yo);
+                }
             }
 
             var testButton3 = new Button { Text = "Change a table object" };
@@ -98,7 +107,7 @@ namespace AreaAnalysis.Views
 
             void OnTestButton3()
             {
-                mainStore[0].RoomName = "coolio";
+                // mainStore[0].RoomName = "coolio";
             }
 
 

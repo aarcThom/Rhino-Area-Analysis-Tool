@@ -9,10 +9,12 @@ namespace AreaAnalysis.Views
 {
     internal class ColumnAddModal : BaseModal
     {
-        private  readonly DropDown _dropDownList;
-        private string _selectedEnglishName;
-        private PropertyInfo _selectedProp;
-        private string _selectedType;
+        private readonly DropDown _dropDownList;
+        private TextArea _dropDesc = new TextArea();
+
+        private string _chosenFieldName;
+        private string _chosenUserName;
+        private TableObject _tableObject = new TableObject();
 
 
         public ColumnAddModal()
@@ -20,79 +22,55 @@ namespace AreaAnalysis.Views
             //Setting the modal title
             Title = "Add a column";
 
-            // getting the TableObject Properties
-            (List<string> tableTypes, List<string> tableNames, 
-                List<PropertyInfo> tableRawProps) = FormatProperties();
+            List<string> fieldNames = _tableObject.GetFieldsNames();
+            List<string> fieldDescriptions = _tableObject.GetFieldsDescriptions();
 
-            //create the dropdown list and label
+            //create the dropdown label, dropdown, and description
+            Label dropLabel = new Label { Text = "What sort of column do you want to add?" };
+
             _dropDownList = new DropDown();
-            foreach (string name in tableNames)
+            foreach (string name in fieldNames)
             {
                 _dropDownList.Items.Add(name);
             }
+
             _dropDownList.SelectedIndex = 0;
 
-            //closing event for dropdown
-            _dropDownList.DropDownClosed += (sender, args) => DropDown_Closed(tableNames, tableRawProps, tableTypes );
-            //opening event for dropdown
-            _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(tableNames, tableRawProps, tableTypes);
+            _dropDesc.ReadOnly = true;
+            _dropDesc.Width = 220;
 
-            Label dropLabel = new Label { Text = "What sort of column do you want to add?" };
+            //closing event for dropdown
+            _dropDownList.DropDownClosed += (sender, args) => DropDown_Closed(fieldNames, fieldDescriptions);
+            //opening event for dropdown
+            _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(fieldNames, fieldDescriptions);
+
 
             // adding the dropdown to the layout
-            ModalLayout.Items.Insert(0,dropLabel);
+            ModalLayout.Items.Insert(0, dropLabel);
             ModalLayout.Items.Insert(1, _dropDownList);
+            ModalLayout.Items.Insert(2, _dropDesc);
 
         }
 
         // get the info
-        public (string, PropertyInfo, string) GetColumnInfo() => (_selectedEnglishName, _selectedProp, _selectedType);
+        public (string, string) GetColumnInfo() => (_chosenFieldName, _chosenUserName);
 
         //wiping return info if cancelled
         protected override void OnCancelButtonClicked()
         {
-            _selectedType = null;
-            _selectedProp = null;
-            _selectedType = null;
+            _chosenFieldName = null;
+            _chosenUserName = null;
 
             base.OnCancelButtonClicked();
         }
 
-        private void DropDown_Closed(List<string> names, List<PropertyInfo> props, List<string> tTypes)
+        private void DropDown_Closed(List<string> fNames, List<string> fDescriptions)
         {
             int choiceIndex = _dropDownList.SelectedIndex;
 
-            _selectedEnglishName = names[choiceIndex];
-            _selectedProp = props[choiceIndex];
-            _selectedType = tTypes[choiceIndex];
+            _chosenFieldName = fNames[choiceIndex];
+            _dropDesc.Text = fDescriptions[choiceIndex];
+
         }
-
-        private (List<string> propTypes, List<string> formattedNames, List<PropertyInfo> propNames) FormatProperties()
-        {
-            Type tObjType = typeof(TableObject);
-
-            PropertyInfo[] properties = tObjType.GetProperties();
-
-            List<string> formattedNames = new List<string>();
-            List<PropertyInfo> propNames = new List<PropertyInfo>();
-            List<string> propTypes = new List<string>();
-
-            foreach (PropertyInfo prop in properties)
-            {
-                if (prop.PropertyType != typeof(Guid))
-                {
-                    //add a space before each capital letter
-                    formattedNames.Add(Regex.Replace(prop.Name, @"(?<!^)([A-Z])", " $1"));
-                    
-                    propNames.Add(prop);
-
-                    propTypes.Add(prop.PropertyType.ToString());
-                }
-                
-            }
-
-            return (propTypes, formattedNames, propNames);
-        }
-
     }
 }
