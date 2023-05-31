@@ -84,7 +84,7 @@ namespace AreaAnalysis.Views
 
             //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Test Controller" };
+            var testButton = new Button { Text = "Add column" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
@@ -99,7 +99,7 @@ namespace AreaAnalysis.Views
             {
                 foreach (var obj in mainStore)
                 {
-                    RhinoApp.WriteLine(obj.IntegerField["hello"].ToString());
+                    RhinoApp.WriteLine(obj.TextField["hello"].ToString());
                 }
             }
 
@@ -110,8 +110,16 @@ namespace AreaAnalysis.Views
             {
                 foreach (var obj in mainStore)
                 {
-                    obj.IntegerField["hello"] = 2;
+                    obj.TextField["hello"] = "chooooo";
                 }
+            }
+
+            var testButton4 = new Button { Text = "Add row" };
+            testButton4.Click += (sender, e) => OnTestButton4();
+
+            void OnTestButton4()
+            {
+                tableController.AddRow();
             }
 
 
@@ -129,7 +137,7 @@ namespace AreaAnalysis.Views
             // PANEL LAYOUT ==============================================================================================================
 
             var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
-            layout.AddSeparateRow(testButton, testButton2, testButton3, null);
+            layout.AddSeparateRow(testButton, testButton2, testButton3,testButton4, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Excel Document" });
             layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);

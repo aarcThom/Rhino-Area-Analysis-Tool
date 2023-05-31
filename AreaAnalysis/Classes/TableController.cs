@@ -39,7 +39,27 @@ namespace AreaAnalysis.Classes
                 AddColumnToExisting();
             }
         }
+
+        public void AddRow()
+        {
+            if (_dTable.Count == 0)
+            {
+                WarningMessageModal warning = new WarningMessageModal(
+                    "You need to add a column first", "No properties found");
+                warning.ShowModal(_parentPanel);
+            }
+            else
+            {
+                AddRowToExisting();
+            }
+        }
         // PRIVATE METHODS ======================================================================================
+
+        private void AddRowToExisting()
+        {
+            TableObject newTObject = new TableObject();
+            _dTable.Add(newTObject);
+        }
 
         private (Type, string) ModalInfo()
         {
@@ -47,44 +67,47 @@ namespace AreaAnalysis.Classes
             columnAddModal.ShowModal(_parentPanel);
             (string fieldName, string userName) = columnAddModal.GetColumnInfo();
 
-            //getting the property
-            string propName = GetPropertyName(fieldName);
-            Type tableType = typeof(TableObject);
-            PropertyInfo propInfo = tableType.GetProperty(propName);
+            if (fieldName != null)
+            {
+                //getting the property
+                string propName = GetPropertyName(fieldName);
+                Type tableType = typeof(TableObject);
+                PropertyInfo propInfo = tableType.GetProperty(propName);
 
-            //getting the value type for the property dictionary
-            Type propType = propInfo.PropertyType.GenericTypeArguments[1];
+                //getting the value type for the property dictionary
+                Type propType = propInfo.PropertyType.GenericTypeArguments[1];
 
-            return (propType, userName);
+                return (propType, userName);
+            }
+            return (null, null);
         }
 
         private void AddColumnToExisting()
         {
             (Type propType, string userName) = ModalInfo();
 
-            TableObject newTObject = new TableObject(propType, userName);
-
-
-            //update existing instances
-            foreach (var existingObj in _dTable)
+            if (propType != null)
             {
-                existingObj.AddNewField(propType, userName);
+                //update existing instances
+                foreach (var existingObj in _dTable)
+                {
+                    existingObj.AddNewField(propType, userName);
+                }
+                EtoMethods.AddColumn(_gView, propType, userName);
             }
-
-            _dTable.Add(newTObject);
-
-            EtoMethods.AddColumn(_gView, propType, userName);
         }
         private void AddColumnToEmpty()
         {
-
+            
             (Type propType, string userName) = ModalInfo();
 
-            // create the table object with proper column
-            TableObject newTObject = new TableObject(propType, userName);
-            _dTable.Add(newTObject);
-            EtoMethods.AddColumn(_gView, propType, userName);
-
+            if (propType != null)
+            {
+                // create the table object with proper column
+                TableObject newTObject = new TableObject(propType, userName);
+                _dTable.Add(newTObject);
+                EtoMethods.AddColumn(_gView, propType, userName);
+            }
         }
 
         // formats the UI name to property name
