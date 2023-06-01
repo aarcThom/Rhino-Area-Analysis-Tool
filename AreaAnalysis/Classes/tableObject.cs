@@ -41,6 +41,9 @@ namespace AreaAnalysis.Classes
         //static field to propagate to all classes
         private static List<string> _numberFieldKeys = new List<string>();
 
+        //a list containing all the key lists - UPDATE THIS TOO!
+        private List<List<string>> _allKeys = new List<List<string>>()
+            { _textFieldKeys, _integerFieldKeys, _numberFieldKeys };
 
         // CONSTRUCTOR ========================================================================================
         public TableObject(Type type = null, string userKey = "")
@@ -177,6 +180,20 @@ namespace AreaAnalysis.Classes
             return fieldDescs;
         }
 
+        public List<string> GetKeys()
+        {
+            List<string> allKeys = new List<string>();
+
+            foreach (var keyList in _allKeys)
+            {
+                foreach (var key in keyList)
+                {
+                    allKeys.Add(key);
+                }
+            }
+            return allKeys;
+        }
+
         public void AddNewField(Type type, string userKey)
         {
             if (type == typeof(string))
@@ -206,11 +223,6 @@ namespace AreaAnalysis.Classes
                     _numberFieldKeys.Add(userKey);
                 }
             }
-        }
-
-        public List<string> GetKeys()
-        {
-            return _textFieldKeys;
         }
 
         // PRIVATE METHODS ======================================================

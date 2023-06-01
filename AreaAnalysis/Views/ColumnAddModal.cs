@@ -25,9 +25,10 @@ namespace AreaAnalysis.Views
             //Setting the modal title
             Title = "Add a column";
 
+            //getting table object info
             List<string> fieldNames = _tableObject.GetFieldsNames();
             List<string> fieldDescriptions = _tableObject.GetFieldsDescriptions();
-
+            
             //create the dropdown label, dropdown, and description
             Label dropLabel = new Label { Text = "What sort of column do you want to add?" };
 
@@ -79,12 +80,21 @@ namespace AreaAnalysis.Views
         // need to provide a column name
         protected override void OnOKButtonClicked()
         {
+            List<string> existingKeys = _tableObject.GetKeys();
+
             if (_userNameBox.Text == "")
             {
                 WarningMessageModal warning = new WarningMessageModal("You must define column name",
                     "Empty column name");
                 warning.ShowModal(this);
             }
+            else if (existingKeys.Contains(_chosenUserName))
+            {
+                WarningMessageModal warning = new WarningMessageModal("New column must have a unique name",
+                    "Duplicate columns");
+                warning.ShowModal(this);
+            }
+
             else
             {
                 base.OnOKButtonClicked();

@@ -57,6 +57,37 @@ namespace AreaAnalysis.Views
 
             // data table display settings
             roomTable.GridLines = GridLines.Both;
+            roomTable.RowHeight = 20;
+            
+            //test event
+            roomTable.MouseDown += (sender, e) =>
+            {
+                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
+                    e.Location.Y <= roomTable.RowHeight && roomTable.Columns.Count > 0)
+                {
+                    // Get the column index from the X-coordinate of the mouse click
+                    GridColumn clickedHeader = null;
+
+                    int prevWidth = 0;
+                    int currWidth = 0;
+                    foreach (var column in roomTable.Columns)
+                    {
+                        currWidth += column.Width;
+                        if (e.Location.X < currWidth && e.Location.X > prevWidth)
+                        {
+                            clickedHeader = column;
+                        }
+                        prevWidth += column.Width;
+                    }
+
+                    if (clickedHeader != null)
+                    {
+                        Rhino.RhinoApp.WriteLine(clickedHeader.HeaderText);
+                    }
+
+
+                }
+            };
 
             //initializing the data controller
             TableController tableController = new TableController(mainStore, this, roomTable);

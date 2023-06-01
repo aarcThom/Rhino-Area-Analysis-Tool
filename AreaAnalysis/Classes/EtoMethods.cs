@@ -74,13 +74,18 @@ namespace AreaAnalysis.Classes
 
             }
 
-            gView.Columns.Add(new GridColumn
+            GridColumn newGColumn = new GridColumn
             {
                 DataCell = new TextBoxCell {Binding = tableBinding},
                 HeaderText = userKey,
                 AutoSize = true,
-                Editable = true
-            });
+                Editable = true,
+                ID = userKey
+
+            };
+
+            gView.Columns.Add(newGColumn);
+
         }
 
     }
