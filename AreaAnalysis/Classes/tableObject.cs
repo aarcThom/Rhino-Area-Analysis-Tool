@@ -182,15 +182,35 @@ namespace AreaAnalysis.Classes
             if (type == typeof(string))
             {
                 _textField.Add(userKey, TextFieldDefault);
+
+                if (!_textFieldKeys.Contains(userKey))
+                {
+                    _textFieldKeys.Add(userKey);
+                }
             }
             else if (type == typeof(int))
             {
                 _integerField.Add(userKey, IntegerFieldDefault);
+
+                if (!_integerFieldKeys.Contains(userKey))
+                {
+                    _integerFieldKeys.Add(userKey);
+                }
             }
             else // if (type = typeof(float))
             {
                 _numberField.Add(userKey, NumberFieldDefault);
+
+                if (!_numberFieldKeys.Contains(userKey))
+                {
+                    _numberFieldKeys.Add(userKey);
+                }
             }
+        }
+
+        public List<string> GetKeys()
+        {
+            return _textFieldKeys;
         }
 
         // PRIVATE METHODS ======================================================

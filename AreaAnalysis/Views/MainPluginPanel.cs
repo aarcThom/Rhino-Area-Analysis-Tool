@@ -35,7 +35,7 @@ namespace AreaAnalysis.Views
         /// <summary>
         /// Provide easy access to the SampleCsEtoPanel.GUID
         /// </summary>
-        public static System.Guid PanelId => typeof(MainPluginPanel).GUID;
+        public static Guid PanelId => typeof(MainPluginPanel).GUID;
 
         /// <summary>
         /// Required public constructor with NO parameters

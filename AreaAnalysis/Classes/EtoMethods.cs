@@ -30,8 +30,7 @@ namespace AreaAnalysis.Classes
             
             if (columnType == typeof(string))
             {
-            
-                RhinoApp.WriteLine("breakpoint!");
+                
                 tableBinding = new DelegateBinding<TableObject, string>(
                     binding => binding.TextField[userKey],
                     (binding, value) =>

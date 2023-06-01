@@ -61,27 +61,6 @@ namespace AreaAnalysis.Classes
             _dTable.Add(newTObject);
         }
 
-        private (Type, string) ModalInfo()
-        {
-            var columnAddModal = new ColumnAddModal();
-            columnAddModal.ShowModal(_parentPanel);
-            (string fieldName, string userName) = columnAddModal.GetColumnInfo();
-
-            if (fieldName != null)
-            {
-                //getting the property
-                string propName = GetPropertyName(fieldName);
-                Type tableType = typeof(TableObject);
-                PropertyInfo propInfo = tableType.GetProperty(propName);
-
-                //getting the value type for the property dictionary
-                Type propType = propInfo.PropertyType.GenericTypeArguments[1];
-
-                return (propType, userName);
-            }
-            return (null, null);
-        }
-
         private void AddColumnToExisting()
         {
             (Type propType, string userName) = ModalInfo();
@@ -108,6 +87,26 @@ namespace AreaAnalysis.Classes
                 _dTable.Add(newTObject);
                 EtoMethods.AddColumn(_gView, propType, userName);
             }
+        }
+        private (Type, string) ModalInfo()
+        {
+            var columnAddModal = new ColumnAddModal();
+            columnAddModal.ShowModal(_parentPanel);
+            (string fieldName, string userName) = columnAddModal.GetColumnInfo();
+
+            if (fieldName != null)
+            {
+                //getting the property
+                string propName = GetPropertyName(fieldName);
+                Type tableType = typeof(TableObject);
+                PropertyInfo propInfo = tableType.GetProperty(propName);
+
+                //getting the value type for the property dictionary
+                Type propType = propInfo.PropertyType.GenericTypeArguments[1];
+
+                return (propType, userName);
+            }
+            return (null, null);
         }
 
         // formats the UI name to property name
