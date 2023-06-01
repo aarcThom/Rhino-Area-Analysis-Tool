@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using AreaAnalysis.Views;
 using Eto.Forms;
 using Rhino;
 
@@ -20,6 +21,7 @@ namespace AreaAnalysis.Classes
             {
                 rhinoHeaders.Add(rHeader.HeaderText);
             }
+
             return rhinoHeaders;
         }
 
@@ -27,19 +29,16 @@ namespace AreaAnalysis.Classes
         {
             DelegateBinding<TableObject, string> tableBinding;
 
-            
+
             if (columnType == typeof(string))
             {
-                
+
                 tableBinding = new DelegateBinding<TableObject, string>(
                     binding => binding.TextField[userKey],
-                    (binding, value) =>
-                    {
-                        binding.TextField[userKey] = value;
-                    });
+                    (binding, value) => { binding.TextField[userKey] = value; });
             }
-            
-            
+
+
             else if (columnType == typeof(int))
             {
                 tableBinding = new DelegateBinding<TableObject, string>(
@@ -76,7 +75,7 @@ namespace AreaAnalysis.Classes
 
             GridColumn newGColumn = new GridColumn
             {
-                DataCell = new TextBoxCell {Binding = tableBinding},
+                DataCell = new TextBoxCell { Binding = tableBinding },
                 HeaderText = userKey,
                 AutoSize = true,
                 Editable = true,
@@ -85,8 +84,35 @@ namespace AreaAnalysis.Classes
             };
 
             gView.Columns.Add(newGColumn);
-
         }
 
+        public static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView)
+        {
+            if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
+                e.Location.Y <= gView.RowHeight && gView.Columns.Count > 0)
+            {
+                // Get the column index from the X-coordinate of the mouse click
+                GridColumn clickedHeader = null;
+
+                int prevWidth = 0;
+                int currWidth = 0;
+                foreach (var column in gView.Columns)
+                {
+                    currWidth += column.Width;
+                    if (e.Location.X < currWidth && e.Location.X > prevWidth)
+                    {
+                        clickedHeader = column;
+                    }
+
+                    prevWidth += column.Width;
+                }
+
+                if (clickedHeader != null)
+                {
+                    HeaderContext cMenu = new HeaderContext(clickedHeader.HeaderText);
+                    cMenu.Show(gView, e.Location);
+                }
+            }
+        }
     }
 }

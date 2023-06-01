@@ -59,58 +59,12 @@ namespace AreaAnalysis.Views
             roomTable.GridLines = GridLines.Both;
             roomTable.RowHeight = 20;
             
-            //test event
-            roomTable.MouseDown += (sender, e) =>
-            {
-                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
-                    e.Location.Y <= roomTable.RowHeight && roomTable.Columns.Count > 0)
-                {
-                    // Get the column index from the X-coordinate of the mouse click
-                    GridColumn clickedHeader = null;
-
-                    int prevWidth = 0;
-                    int currWidth = 0;
-                    foreach (var column in roomTable.Columns)
-                    {
-                        currWidth += column.Width;
-                        if (e.Location.X < currWidth && e.Location.X > prevWidth)
-                        {
-                            clickedHeader = column;
-                        }
-                        prevWidth += column.Width;
-                    }
-
-                    if (clickedHeader != null)
-                    {
-                        Rhino.RhinoApp.WriteLine(clickedHeader.HeaderText);
-                    }
-
-
-                }
-            };
+            // room table events--------------------------------------------------------------------
+            // right click the headers
+            roomTable.MouseDown += (sender, e) => EtoMethods.HeaderRightClick(sender, e, roomTable);
 
             //initializing the data controller
             TableController tableController = new TableController(mainStore, this, roomTable);
-
-            //Eto button to add column
-            var addColumnButton = new Button { Text = "Add Column to Table" };
-            addColumnButton.Click += (sender, e) => OnAddColumnButton();
-
-            void OnAddColumnButton()
-            {
-                var columnAddDialog = new ColumnAddModal();
-                columnAddDialog.ShowModal(this);
-                /*
-                (string colName, PropertyInfo colProp, string colType) = columnAddDialog.GetColumnInfo();
-
-                //add column if not null
-                if (colName != null && colProp != null && colType != null)
-                {
-                    EtoMethods.AddColumn(roomTable, colName, colProp, colType);
-                }
-                */
-
-            }
 
 
             //TEST BUTTON ==============================================================================================================
@@ -174,7 +128,6 @@ namespace AreaAnalysis.Views
             layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
-            layout.AddSeparateRow(addColumnButton, null);
             //layout.AddSeparateRow(addColumnButton, null);
             layout.Add(roomTable, yscale: true);
             layout.Add(null);
