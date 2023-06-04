@@ -6,6 +6,8 @@ namespace AreaAnalysis.Views
     {
         public StackLayout ModalLayout = new StackLayout() {Padding = 10, Spacing = 6};
 
+        private bool _closeStatus = false; // need to prevent the X button from messing things up
+
         public BaseModal()
         {
             Title = "Custom Dialog";
@@ -30,16 +32,28 @@ namespace AreaAnalysis.Views
 
             ModalLayout.Items.Add(buttonLayout);
 
+            Closing += (sender, Enabled) => OnClosingEvent();
+
         }
 
         protected virtual void OnOKButtonClicked()
         {
+            _closeStatus = true;
             Close();
         }
 
         protected virtual void OnCancelButtonClicked()
         {
+            _closeStatus = true;
             Close();
+        }
+
+        protected virtual void OnClosingEvent()
+        {
+            if (!_closeStatus)
+            {
+                OnCancelButtonClicked();
+            }
         }
     }
 }

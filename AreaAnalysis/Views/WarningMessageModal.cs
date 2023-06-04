@@ -7,17 +7,32 @@ using Eto.Forms;
 
 namespace AreaAnalysis.Views
 {
-    public class WarningMessageModal : BaseModal
+    public class WarningMessageModal : Dialog
     {
+        public StackLayout ModalLayout = new StackLayout()
+        {
+            Padding = 10,
+            Spacing = 6
+        };
 
         public WarningMessageModal(string message, string title)
         {
             Title = title;
 
+            Content = ModalLayout;
+
             Label warning = new Label { Text = message };
 
-            // adding the dropdown to the layout
-            ModalLayout.Items.Insert(0, warning);
+            Button okButton = new Button { Text = "OK" };
+            okButton.Click += (sender, e) => OnOKButtonClicked();
+
+            ModalLayout.Items.Add(warning);
+            ModalLayout.Items.Add(okButton);
+        }
+
+        protected virtual void OnOKButtonClicked()
+        {
+            Close();
         }
     }
 }

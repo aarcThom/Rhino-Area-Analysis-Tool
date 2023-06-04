@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -53,6 +54,48 @@ namespace AreaAnalysis.Classes
                 AddRowToExisting();
             }
         }
+
+        public void RenameHeader(string oldName, string newName, GridColumn column, int index)
+        {
+            TableObject blankObj = new TableObject();
+            string propName = null;
+            Type dictType = null;
+
+            //get the property dictionary location
+            PropertyInfo[] props = typeof(TableObject).GetProperties();
+            foreach (var prop in props )
+            {
+                var dictProp = prop.GetValue(blankObj);
+                if (dictProp is IDictionary)
+                {
+                    IDictionary dict = (IDictionary)dictProp;
+
+                    if (dict.Contains(oldName))
+                    {
+                        propName = prop.Name;
+                        dictType = dict.GetType().GenericTypeArguments[0];
+
+                    }
+                }
+            }
+
+            // rename the dictionary keys in the table objects
+            if (propName != null && dictType != null)
+            {
+                foreach (var tObj in _dTable)
+                {
+                    tObj.ChangeField(dictType, oldName, newName);
+                }
+
+                //relink the eto column
+                GridColumn gCol = EtoMethods.AddColumn(_gView, dictType, newName);
+                _gView.Columns.RemoveAt(index);
+                _gView.Columns.Insert(index, gCol);
+            }
+
+
+
+        }
         // PRIVATE METHODS ======================================================================================
 
         private void AddRowToExisting()
@@ -72,7 +115,8 @@ namespace AreaAnalysis.Classes
                 {
                     existingObj.AddNewField(propType, userName);
                 }
-                EtoMethods.AddColumn(_gView, propType, userName);
+                GridColumn gCol = EtoMethods.AddColumn(_gView, propType, userName);
+                _gView.Columns.Add(gCol);
             }
         }
         private void AddColumnToEmpty()
@@ -85,7 +129,8 @@ namespace AreaAnalysis.Classes
                 // create the table object with proper column
                 TableObject newTObject = new TableObject(propType, userName);
                 _dTable.Add(newTObject);
-                EtoMethods.AddColumn(_gView, propType, userName);
+                GridColumn gCol = EtoMethods.AddColumn(_gView, propType, userName);
+                _gView.Columns.Add(gCol);
             }
         }
         private (Type, string) ModalInfo()

@@ -225,9 +225,50 @@ namespace AreaAnalysis.Classes
             }
         }
 
+        public void ChangeField(Type type, string oldKey, string newKey)
+        {
+            if (type == typeof(string))
+            {
+                string value = _textField[oldKey];
+                _textField.Remove(oldKey);
+                _textField.Add(newKey, value);
+
+                if (_textFieldKeys.Contains(oldKey))
+                {
+                    int index = _textFieldKeys.IndexOf(oldKey);
+                    _textFieldKeys[index] = newKey;
+                }
+            }
+            else if (type == typeof(int))
+            {
+                int value = _integerField[oldKey];
+                _integerField.Remove(oldKey);
+                _integerField.Add(newKey, value);
+
+                if (_integerFieldKeys.Contains(oldKey))
+                {
+                    int index = _integerFieldKeys.IndexOf(oldKey);
+                    _integerFieldKeys[index] = newKey;
+                }
+            }
+            else // if (type = typeof(float))
+            {
+                float value = _numberField[oldKey];
+                _numberField.Remove(oldKey);
+                _numberField.Add(newKey, value);
+
+                if (_numberFieldKeys.Contains(oldKey))
+                {
+                    int index = _numberFieldKeys.IndexOf(oldKey);
+                    _numberFieldKeys[index] = newKey;
+                }
+            }
+        }
+
+
         // PRIVATE METHODS ======================================================
 
-        private List<string> GetProperties()
+            private List<string> GetProperties()
         {
             Type tableType = typeof(TableObject);
             PropertyInfo[] tableProps = tableType.GetProperties();

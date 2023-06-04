@@ -25,7 +25,7 @@ namespace AreaAnalysis.Classes
             return rhinoHeaders;
         }
 
-        public static void AddColumn(GridView gView, Type columnType, string userKey)
+        public static GridColumn AddColumn(GridView gView, Type columnType, string userKey)
         {
             DelegateBinding<TableObject, string> tableBinding;
 
@@ -83,10 +83,11 @@ namespace AreaAnalysis.Classes
 
             };
 
-            gView.Columns.Add(newGColumn);
+            return newGColumn;
         }
 
-        public static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView)
+        public static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
+            Control blockControl, TableController tControl)
         {
             if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
                 e.Location.Y <= gView.RowHeight && gView.Columns.Count > 0)
@@ -96,20 +97,26 @@ namespace AreaAnalysis.Classes
 
                 int prevWidth = 0;
                 int currWidth = 0;
+                int columnIx = 0;
                 foreach (var column in gView.Columns)
                 {
                     currWidth += column.Width;
                     if (e.Location.X < currWidth && e.Location.X > prevWidth)
                     {
                         clickedHeader = column;
+                        break;
                     }
 
                     prevWidth += column.Width;
+                    columnIx++;
                 }
+
+                RhinoApp.WriteLine(columnIx.ToString());
 
                 if (clickedHeader != null)
                 {
-                    HeaderContext cMenu = new HeaderContext(clickedHeader.HeaderText);
+                    HeaderContext cMenu = new HeaderContext(
+                        clickedHeader.HeaderText, blockControl, tControl, clickedHeader, columnIx);
                     cMenu.Show(gView, e.Location);
                 }
             }

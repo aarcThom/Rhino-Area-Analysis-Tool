@@ -58,13 +58,14 @@ namespace AreaAnalysis.Views
             // data table display settings
             roomTable.GridLines = GridLines.Both;
             roomTable.RowHeight = 20;
-            
-            // room table events--------------------------------------------------------------------
-            // right click the headers
-            roomTable.MouseDown += (sender, e) => EtoMethods.HeaderRightClick(sender, e, roomTable);
 
             //initializing the data controller
             TableController tableController = new TableController(mainStore, this, roomTable);
+
+            // room table events--------------------------------------------------------------------
+            // right click the headers
+            roomTable.MouseDown += (sender, e) => 
+                EtoMethods.HeaderRightClick(sender, e, roomTable, this, tableController);
 
 
             //TEST BUTTON ==============================================================================================================
@@ -77,7 +78,7 @@ namespace AreaAnalysis.Views
                 tableController.AddColumn();
             }
 
-            var testButton2 = new Button { Text = "Print Objects" };
+            var testButton2 = new Button { Text = "Rename header" };
             testButton2.Click += (sender, e) => OnTestButton2();
 
             void OnTestButton2()
