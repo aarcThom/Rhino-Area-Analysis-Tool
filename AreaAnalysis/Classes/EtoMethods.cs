@@ -25,6 +25,19 @@ namespace AreaAnalysis.Classes
             return rhinoHeaders;
         }
 
+        public static GridColumn AddLinkColumn(GridView gView)
+        {
+            GridColumn newCol = new GridColumn
+            {
+                HeaderText = "Rhino Link",
+                DataCell = new TextBoxCell { Binding = Binding.Property((TableObject t) => t.LinkStatus) },
+                Editable = false,
+                AutoSize = true,
+                ID = "Rhino Link"
+            };
+            return newCol;
+        }
+
         public static GridColumn AddColumn(GridView gView, Type columnType, string userKey)
         {
             DelegateBinding<TableObject, string> tableBinding;

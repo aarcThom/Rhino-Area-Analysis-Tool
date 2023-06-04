@@ -100,9 +100,16 @@ namespace AreaAnalysis.Classes
 
         private void AddColumnToExisting()
         {
-            (Type propType, string userName) = ModalInfo();
+            (Type propType, string userName, bool isLink) = ModalInfo();
 
-            if (propType != null)
+            if (isLink)
+            {
+                TableObject newTObject = new TableObject();
+                _dTable.Add(newTObject);
+                GridColumn gCol = EtoMethods.AddLinkColumn(_gView);
+                _gView.Columns.Add(gCol);
+            }
+            else if (propType != null)
             {
                 //update existing instances
                 foreach (var existingObj in _dTable)
@@ -116,9 +123,16 @@ namespace AreaAnalysis.Classes
         private void AddColumnToEmpty()
         {
             
-            (Type propType, string userName) = ModalInfo();
+            (Type propType, string userName, bool isLink) = ModalInfo();
 
-            if (propType != null)
+            if (isLink)
+            {
+                TableObject newTObject = new TableObject();
+                _dTable.Add(newTObject);
+                GridColumn gCol = EtoMethods.AddLinkColumn(_gView);
+                _gView.Columns.Add(gCol);
+            }
+            else if (propType != null)
             {
                 // create the table object with proper column
                 TableObject newTObject = new TableObject(propType, userName);
@@ -127,13 +141,19 @@ namespace AreaAnalysis.Classes
                 _gView.Columns.Add(gCol);
             }
         }
-        private (Type, string) ModalInfo()
+        private (Type, string, bool) ModalInfo()
         {
             var columnAddModal = new ColumnAddModal();
             columnAddModal.ShowModal(_parentPanel);
-            (string fieldName, string userName) = columnAddModal.GetColumnInfo();
+            (string fieldName, string userName, bool isLink) = columnAddModal.GetColumnInfo();
 
-            if (fieldName != null)
+
+            if (isLink)
+            {
+                // return if adding link column
+                return (null, null, true);
+            }
+            else if (fieldName != null)
             {
                 //getting the property
                 string propName = GetPropertyName(fieldName);
@@ -143,9 +163,9 @@ namespace AreaAnalysis.Classes
                 //getting the value type for the property dictionary
                 Type propType = propInfo.PropertyType.GenericTypeArguments[1];
 
-                return (propType, userName);
+                return (propType, userName, false);
             }
-            return (null, null);
+            return (null, null, false);
         }
 
         // formats the UI name to property name

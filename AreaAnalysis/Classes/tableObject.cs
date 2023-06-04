@@ -17,6 +17,14 @@ namespace AreaAnalysis.Classes
 {
     public class TableObject : INotifyPropertyChanged
     {
+        // GUID LINKAGE STUFF ==========================================================================
+        private Guid _rhinoGuid;
+        private readonly string _linkColumnName = "Rhino Link";
+        private readonly string _linkColDescription = "Use this column to link a Rhino object to your data table.";
+        private readonly string _unlinked = "❌";
+        private readonly string _linked = "✔️";
+
+
         // FIELDS ======================================================================================
 
         private FieldDict<string, string> _textField = new FieldDict<string, string>();
@@ -41,13 +49,19 @@ namespace AreaAnalysis.Classes
         //static field to propagate to all classes
         private static List<string> _numberFieldKeys = new List<string>();
 
+
+
+
         //a list containing all the key lists - UPDATE THIS TOO!
         private List<List<string>> _allKeys = new List<List<string>>()
-            { _textFieldKeys, _integerFieldKeys, _numberFieldKeys };
+            { _textFieldKeys, _integerFieldKeys, _numberFieldKeys};
 
         // CONSTRUCTOR ========================================================================================
         public TableObject(Type type = null, string userKey = "")
         {
+            //setting link status
+            LinkStatus = _unlinked;
+
 
             // add existing keys to new instance
             foreach (var key in _textFieldKeys)
@@ -64,6 +78,7 @@ namespace AreaAnalysis.Classes
             {
                 _numberField.Add(key, NumberFieldDefault);
             }
+
 
             // adding new keys to new instance
             if (type != null && userKey != "")
@@ -96,6 +111,11 @@ namespace AreaAnalysis.Classes
 
         // PROPERTIES =================================================================
 
+        // the rhino link property
+
+        public string LinkStatus { get; set; }
+
+        // dictionaries for new multiple columns
         public FieldDict<string, string> TextField
         {
             get => _textField;
@@ -165,6 +185,9 @@ namespace AreaAnalysis.Classes
             {
                 fieldNames.Add(FormatFieldNames(prop));
             }
+
+            fieldNames.Add(_linkColumnName); // need to add link name to end
+
             return fieldNames;
         }
 
@@ -177,10 +200,13 @@ namespace AreaAnalysis.Classes
                 string propName = FormatFieldDescs(prop);
                 fieldDescs.Add(GetPropValue(propName));
             }
+
+            fieldDescs.Add(_linkColDescription); // need to add link description to end
+
             return fieldDescs;
         }
 
-        public List<string> GetKeys()
+        public (List<string>, string) GetKeys()
         {
             List<string> allKeys = new List<string>();
 
@@ -191,7 +217,8 @@ namespace AreaAnalysis.Classes
                     allKeys.Add(key);
                 }
             }
-            return allKeys;
+
+            return (allKeys, _linkColumnName); // need to return link column name as well
         }
 
         public void AddNewField(Type type, string userKey)
@@ -309,7 +336,10 @@ namespace AreaAnalysis.Classes
 
             foreach (var name in tableProps)
             {
-                propNames.Add(name.Name);
+                if (name.Name != "LinkStatus")
+                {
+                    propNames.Add(name.Name);
+                }
             }
 
             return propNames;
