@@ -107,10 +107,21 @@ namespace AreaAnalysis.Classes
             {
                 HeaderRightClick(sender, e, gView, blockControl, tControl);
             }
+            else if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
+                     e.Location.Y > gView.RowHeight && gView.Columns.Count > 0)
+            {
+                CellClick(sender, e, gView, blockControl, tControl);
+            }
         }
 
-        private static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
+        private static void CellClick(object sender, MouseEventArgs e, GridView gView,
             Control blockControl, TableController tControl)
+        {
+            (GridColumn clickedHeader, int columnIx) = ClickedColumn(e, gView);
+            RhinoApp.WriteLine(clickedHeader.HeaderText);
+        }
+
+        private static (GridColumn, int) ClickedColumn(MouseEventArgs e, GridView gView)
         {
             // Get the column index from the X-coordinate of the mouse click
             GridColumn clickedHeader = null;
@@ -131,7 +142,14 @@ namespace AreaAnalysis.Classes
                 columnIx++;
             }
 
-            RhinoApp.WriteLine(columnIx.ToString());
+            return (clickedHeader, columnIx);
+        }
+
+        private static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
+            Control blockControl, TableController tControl)
+        {
+
+            (GridColumn clickedHeader, int columnIx) = ClickedColumn(e, gView);
 
             if (clickedHeader != null)
             {

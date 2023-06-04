@@ -14,16 +14,29 @@ namespace AreaAnalysis.Views
     {
         public HeaderContext(string headerName, Control blockedMenu, TableController tControl, GridColumn column, int index)
         {
-            ButtonMenuItem renameHeadBut = new ButtonMenuItem() { Text = "Rename header \"" + headerName + "\"" };
-            ButtonMenuItem deleteHeadBut = new ButtonMenuItem() { Text = "Delete header \"" + headerName + "\"" };
-            ButtonMenuItem addDependentBut = new ButtonMenuItem() { Text = "Add dependent column to \"" + headerName + "\"" };
-
-            renameHeadBut.Click += (sender, e) =>
+            // allowable functions for non-link columns
+            if (headerName != "Rhino Link")
             {
-                RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, index);
-                renameHeader.ShowModal(blockedMenu);
-                
-            };
+                ButtonMenuItem renameHeadBut = new ButtonMenuItem() { Text = "Rename header \"" + headerName + "\"" };
+                ButtonMenuItem addDependentBut = new ButtonMenuItem() { Text = "Add dependent column to \"" + headerName + "\"" };
+
+                renameHeadBut.Click += (sender, e) =>
+                {
+                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, index);
+                    renameHeader.ShowModal(blockedMenu);
+
+                };
+
+                addDependentBut.Click += (sender, e) => RhinoApp.WriteLine("added dependent");
+
+                Items.Add(renameHeadBut);
+                Items.Add(addDependentBut);
+            }
+
+            //allowable functions for all!
+
+            ButtonMenuItem deleteHeadBut = new ButtonMenuItem() { Text = "Delete header \"" + headerName + "\"" };
+
 
             deleteHeadBut.Click += (sender, e) =>
             {
@@ -31,13 +44,8 @@ namespace AreaAnalysis.Views
                 deleteCol.ShowModal(blockedMenu);
             };
 
-
-
-            addDependentBut.Click += (sender, e) => RhinoApp.WriteLine("added dependent");
-
-            Items.Add(renameHeadBut);
             Items.Add(deleteHeadBut);
-            Items.Add(addDependentBut);
+            
         }
     }
 }
