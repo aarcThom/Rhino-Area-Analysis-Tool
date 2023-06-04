@@ -25,7 +25,14 @@ namespace AreaAnalysis.Views
                 
             };
 
-            deleteHeadBut.Click += (sender, e) => RhinoApp.WriteLine("clicked delete");
+            deleteHeadBut.Click += (sender, e) =>
+            {
+                DeleteColumnModal deleteCol = new DeleteColumnModal(headerName, index, tControl);
+                deleteCol.ShowModal(blockedMenu);
+            };
+
+
+
             addDependentBut.Click += (sender, e) => RhinoApp.WriteLine("added dependent");
 
             Items.Add(renameHeadBut);

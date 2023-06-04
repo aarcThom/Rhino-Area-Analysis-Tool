@@ -86,39 +86,45 @@ namespace AreaAnalysis.Classes
             return newGColumn;
         }
 
-        public static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
+        public static void MouseClickHandler(object sender, MouseEventArgs e, GridView gView,
             Control blockControl, TableController tControl)
         {
             if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
                 e.Location.Y <= gView.RowHeight && gView.Columns.Count > 0)
             {
-                // Get the column index from the X-coordinate of the mouse click
-                GridColumn clickedHeader = null;
+                HeaderRightClick(sender, e, gView, blockControl, tControl);
+            }
+        }
 
-                int prevWidth = 0;
-                int currWidth = 0;
-                int columnIx = 0;
-                foreach (var column in gView.Columns)
+        private static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
+            Control blockControl, TableController tControl)
+        {
+            // Get the column index from the X-coordinate of the mouse click
+            GridColumn clickedHeader = null;
+
+            int prevWidth = 0;
+            int currWidth = 0;
+            int columnIx = 0;
+            foreach (var column in gView.Columns)
+            {
+                currWidth += column.Width;
+                if (e.Location.X < currWidth && e.Location.X > prevWidth)
                 {
-                    currWidth += column.Width;
-                    if (e.Location.X < currWidth && e.Location.X > prevWidth)
-                    {
-                        clickedHeader = column;
-                        break;
-                    }
-
-                    prevWidth += column.Width;
-                    columnIx++;
+                    clickedHeader = column;
+                    break;
                 }
 
-                RhinoApp.WriteLine(columnIx.ToString());
+                prevWidth += column.Width;
+                columnIx++;
+            }
 
-                if (clickedHeader != null)
-                {
-                    HeaderContext cMenu = new HeaderContext(
-                        clickedHeader.HeaderText, blockControl, tControl, clickedHeader, columnIx);
-                    cMenu.Show(gView, e.Location);
-                }
+            RhinoApp.WriteLine(columnIx.ToString());
+
+            if (clickedHeader != null)
+            {
+                HeaderContext cMenu = new HeaderContext(
+                    clickedHeader.HeaderText, blockControl, tControl, clickedHeader, columnIx);
+                cMenu.Show(gView, e.Location);
             }
         }
     }

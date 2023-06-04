@@ -52,7 +52,7 @@ namespace AreaAnalysis.Views
             DataTable mainStore = new DataTable();
             
             //linking the eto grid view
-            var roomTable = new GridView { AllowColumnReordering = true };
+            var roomTable = new GridView();
             roomTable.DataStore = mainStore;
 
             // data table display settings
@@ -63,9 +63,9 @@ namespace AreaAnalysis.Views
             TableController tableController = new TableController(mainStore, this, roomTable);
 
             // room table events--------------------------------------------------------------------
-            // right click the headers
+            // handle clicks on room table
             roomTable.MouseDown += (sender, e) => 
-                EtoMethods.HeaderRightClick(sender, e, roomTable, this, tableController);
+                EtoMethods.MouseClickHandler(sender, e, roomTable, this, tableController);
 
 
             //TEST BUTTON ==============================================================================================================

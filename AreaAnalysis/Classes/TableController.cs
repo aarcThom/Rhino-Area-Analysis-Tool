@@ -57,30 +57,10 @@ namespace AreaAnalysis.Classes
 
         public void RenameHeader(string oldName, string newName, GridColumn column, int index)
         {
-            TableObject blankObj = new TableObject();
-            string propName = null;
-            Type dictType = null;
-
-            //get the property dictionary location
-            PropertyInfo[] props = typeof(TableObject).GetProperties();
-            foreach (var prop in props )
-            {
-                var dictProp = prop.GetValue(blankObj);
-                if (dictProp is IDictionary)
-                {
-                    IDictionary dict = (IDictionary)dictProp;
-
-                    if (dict.Contains(oldName))
-                    {
-                        propName = prop.Name;
-                        dictType = dict.GetType().GenericTypeArguments[0];
-
-                    }
-                }
-            }
+            Type dictType = GetDictionaryValueType(oldName);
 
             // rename the dictionary keys in the table objects
-            if (propName != null && dictType != null)
+            if (dictType != null)
             {
                 foreach (var tObj in _dTable)
                 {
@@ -92,10 +72,24 @@ namespace AreaAnalysis.Classes
                 _gView.Columns.RemoveAt(index);
                 _gView.Columns.Insert(index, gCol);
             }
-
-
-
         }
+
+        public void DeleteColumn(string columnName, int colIndex)
+        {
+            Type dictType = GetDictionaryValueType(columnName);
+
+            if (dictType != null)
+            {
+                foreach (var dObj in _dTable)
+                {
+                    dObj.DeleteField(dictType, columnName);
+                }
+            }
+
+            _gView.Columns.RemoveAt(colIndex);
+        }
+
+
         // PRIVATE METHODS ======================================================================================
 
         private void AddRowToExisting()
@@ -158,6 +152,34 @@ namespace AreaAnalysis.Classes
         private string GetPropertyName(string uiName)
         {
             return uiName.Replace(" ", "");
+        }
+
+        //gets the type of value in a given dictionary property in table object based on key
+
+        private Type GetDictionaryValueType(string keyName)
+        {
+            TableObject blankObj = new TableObject();
+
+            Type dictType = null;
+
+            //get the property dictionary location
+            PropertyInfo[] props = typeof(TableObject).GetProperties();
+            foreach (var prop in props)
+            {
+                var dictProp = prop.GetValue(blankObj);
+                if (dictProp is IDictionary)
+                {
+                    IDictionary dict = (IDictionary)dictProp;
+
+                    if (dict.Contains(keyName))
+                    {
+                        dictType = dict.GetType().GenericTypeArguments[0];
+
+                    }
+                }
+            }
+
+            return dictType;
         }
     }
 }

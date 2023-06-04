@@ -265,6 +265,38 @@ namespace AreaAnalysis.Classes
             }
         }
 
+        public void DeleteField(Type type, string key)
+        {
+            if (type == typeof(string))
+            {
+                _textField.Remove(key);
+
+                if (_textFieldKeys.Contains(key))
+                {
+                    _textFieldKeys.Remove(key);
+                }
+
+            }
+            else if (type == typeof(int))
+            {
+               _integerField.Remove(key);
+
+               if (_integerFieldKeys.Contains(key))
+               {
+                   _integerFieldKeys.Remove(key);
+               }
+            }
+            else // if (type = typeof(float))
+            {
+               _numberField.Remove(key);
+
+               if (_numberFieldKeys.Contains(key))
+               {
+                   _numberFieldKeys.Remove(key);
+               }
+            }
+        }
+
 
         // PRIVATE METHODS ======================================================
 
