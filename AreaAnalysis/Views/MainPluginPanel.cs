@@ -30,16 +30,16 @@ namespace AreaAnalysis.Views
     [System.Runtime.InteropServices.Guid("29BA961F-A5C5-48D0-A352-11D1B7F336CF")]
     public class MainPluginPanel : Panel
     {
+        // Rhino default setup=======================================
         readonly uint _mDocumentSn = 0;
 
-        /// <summary>
-        /// Provide easy access to the SampleCsEtoPanel.GUID
-        /// </summary>
+        // Provide easy access to the SampleCsEtoPanel.GUID
         public static Guid PanelId => typeof(MainPluginPanel).GUID;
 
-        /// <summary>
-        /// Required public constructor with NO parameters
-        /// </summary>
+        //Mouse event field for interacting with gridview
+        private MouseEventArgs _mouse;
+
+
         public MainPluginPanel(uint documentSerialNumber)
         {
             //Rhino Panel Setup
@@ -52,7 +52,12 @@ namespace AreaAnalysis.Views
             DataTable mainStore = new DataTable();
             
             //linking the eto grid view
-            var roomTable = new GridView();
+            var roomTable = new GridView
+            {
+                AllowColumnReordering = true,
+                AllowMultipleSelection = true
+            };
+
             roomTable.DataStore = mainStore;
 
             // data table display settings
@@ -64,9 +69,24 @@ namespace AreaAnalysis.Views
 
             // room table events--------------------------------------------------------------------
             // handle clicks on room table
-            roomTable.MouseDown += (sender, e) => 
-                EtoMethods.MouseClickHandler(sender, e, roomTable, this, tableController);
 
+
+            roomTable.MouseDown += (sender, e) =>
+            {
+                _mouse = e;
+            };
+
+            roomTable.CellClick += (sender, e) =>
+            {
+                EtoMethods.CellClick(sender, e, this, tableController);
+            };
+
+            
+            roomTable.ColumnHeaderClick += (sender, e) =>
+            {
+                EtoMethods.HeaderClick(sender, e, this, tableController, _mouse);
+            };
+            
 
             //TEST BUTTON ==============================================================================================================
 
@@ -78,7 +98,7 @@ namespace AreaAnalysis.Views
                 tableController.AddColumn();
             }
 
-            var testButton2 = new Button { Text = "Rename header" };
+            var testButton2 = new Button { Text = "Print hello objects" };
             testButton2.Click += (sender, e) => OnTestButton2();
 
             void OnTestButton2()

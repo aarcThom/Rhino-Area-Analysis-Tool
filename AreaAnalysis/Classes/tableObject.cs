@@ -324,6 +324,11 @@ namespace AreaAnalysis.Classes
             }
         }
 
+        public string GetLinkName()
+        {
+            return _linkColumnName;
+        }
+
 
         // PRIVATE METHODS ======================================================
 

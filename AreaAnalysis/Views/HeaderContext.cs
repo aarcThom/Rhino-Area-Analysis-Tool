@@ -12,7 +12,8 @@ namespace AreaAnalysis.Views
 {
     public class HeaderContext : ContextMenu
     {
-        public HeaderContext(string headerName, Control blockedMenu, TableController tControl, GridColumn column, int index)
+        public HeaderContext(string headerName, Control blockedMenu, TableController tControl, 
+            GridColumn column, int index, List<string> headerNames)
         {
             // allowable functions for non-link columns
             if (headerName != "Rhino Link")
@@ -22,7 +23,7 @@ namespace AreaAnalysis.Views
 
                 renameHeadBut.Click += (sender, e) =>
                 {
-                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, index);
+                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, index, headerNames);
                     renameHeader.ShowModal(blockedMenu);
 
                 };

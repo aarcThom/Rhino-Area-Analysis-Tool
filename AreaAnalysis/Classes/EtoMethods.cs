@@ -9,31 +9,22 @@ using System.Threading.Tasks;
 using AreaAnalysis.Views;
 using Eto.Forms;
 using Rhino;
+using Rhino.Geometry;
 
 namespace AreaAnalysis.Classes
 {
     class EtoMethods
     {
-        public static List<string> GetGridViewHeaders(GridView gView)
-        {
-            List<string> rhinoHeaders = new List<string>();
-            foreach (var rHeader in gView.Columns)
-            {
-                rhinoHeaders.Add(rHeader.HeaderText);
-            }
 
-            return rhinoHeaders;
-        }
-
-        public static GridColumn AddLinkColumn(GridView gView)
+        public static GridColumn AddLinkColumn(GridView gView,string linkName)
         {
             GridColumn newCol = new GridColumn
             {
-                HeaderText = "Rhino Link",
+                HeaderText = linkName,
                 DataCell = new TextBoxCell { Binding = Binding.Property((TableObject t) => t.LinkStatus) },
                 Editable = false,
                 AutoSize = true,
-                ID = "Rhino Link"
+                ID = linkName
             };
             return newCol;
         }
@@ -92,70 +83,67 @@ namespace AreaAnalysis.Classes
                 HeaderText = userKey,
                 AutoSize = true,
                 Editable = true,
-                ID = userKey
+                ID = userKey,
+                Sortable = true
 
             };
 
             return newGColumn;
         }
 
-        public static void MouseClickHandler(object sender, MouseEventArgs e, GridView gView,
+        public static void CellClick(object sender, GridCellMouseEventArgs e,
             Control blockControl, TableController tControl)
         {
-            if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
-                e.Location.Y <= gView.RowHeight && gView.Columns.Count > 0)
-            {
-                HeaderRightClick(sender, e, gView, blockControl, tControl);
-            }
-            else if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None &&
-                     e.Location.Y > gView.RowHeight && gView.Columns.Count > 0)
-            {
-                CellClick(sender, e, gView, blockControl, tControl);
-            }
-        }
+            GridView gView = sender as GridView;
 
-        private static void CellClick(object sender, MouseEventArgs e, GridView gView,
-            Control blockControl, TableController tControl)
-        {
-            (GridColumn clickedHeader, int columnIx) = ClickedColumn(e, gView);
-            RhinoApp.WriteLine(clickedHeader.HeaderText);
-        }
-
-        private static (GridColumn, int) ClickedColumn(MouseEventArgs e, GridView gView)
-        {
-            // Get the column index from the X-coordinate of the mouse click
-            GridColumn clickedHeader = null;
-
-            int prevWidth = 0;
-            int currWidth = 0;
-            int columnIx = 0;
-            foreach (var column in gView.Columns)
+            if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None && e.Column >= 0 && e.Row >= 0)
             {
-                currWidth += column.Width;
-                if (e.Location.X < currWidth && e.Location.X > prevWidth)
+                List<int> selectedIndices = new List<int>();
+
+                var selectedRows = gView.SelectedItems;
+
+                if (selectedRows.Count() > 1)
                 {
-                    clickedHeader = column;
-                    break;
+                    foreach (TableObject row in selectedRows)
+                    {
+                        selectedIndices.Add(tControl.GetRowIndex(row));
+                    }
+                }
+                else
+                {
+                    selectedIndices.Add(e.Row);
                 }
 
-                prevWidth += column.Width;
-                columnIx++;
+                CellContext cMenu = new CellContext(selectedIndices, tControl);
+                cMenu.Show(gView, e.Location);
             }
 
-            return (clickedHeader, columnIx);
+            
+
         }
 
-        private static void HeaderRightClick(object sender, MouseEventArgs e, GridView gView, 
-            Control blockControl, TableController tControl)
-        {
 
-            (GridColumn clickedHeader, int columnIx) = ClickedColumn(e, gView);
+        public static void HeaderClick(object sender, GridColumnEventArgs e, 
+            Control blockControl, TableController tControl, MouseEventArgs m)
+        {
+            GridView gView = sender as GridView;
+            
+            List<string> headerNames =  new List<string>();
+
+            foreach (var col in gView.Columns)
+            {
+                headerNames.Add(col.HeaderText);
+            }
+
+            GridColumn clickedHeader = e.Column;
+            int columnIx = gView.Columns.IndexOf(clickedHeader);
 
             if (clickedHeader != null)
             {
                 HeaderContext cMenu = new HeaderContext(
-                    clickedHeader.HeaderText, blockControl, tControl, clickedHeader, columnIx);
-                cMenu.Show(gView, e.Location);
+                    clickedHeader.HeaderText, blockControl, tControl, clickedHeader, 
+                    columnIx, headerNames);
+                cMenu.Show(gView, m.Location);
             }
         }
     }

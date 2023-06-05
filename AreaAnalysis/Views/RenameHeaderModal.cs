@@ -16,7 +16,9 @@ namespace AreaAnalysis.Views
         private string _oldName;
         private GridColumn _column;
         private int _index;
-        public RenameHeaderModal(string currentHeader, TableController tControl, GridColumn column, int index)
+        private List<string> _headerNames;
+
+        public RenameHeaderModal(string currentHeader, TableController tControl, GridColumn column, int index, List<string>headerNames)
         {
             //pass the controller
             _controller = tControl;
@@ -26,6 +28,8 @@ namespace AreaAnalysis.Views
             _column = column;
 
             _index = index;
+
+            _headerNames = headerNames;
 
             //modal title
             Title = "Rename header";
@@ -44,7 +48,14 @@ namespace AreaAnalysis.Views
 
         protected override void OnOKButtonClicked()
         {
-            if (_newName != null)
+            if (_headerNames.Contains(_newName))
+
+            {
+                WarningMessageModal warning =
+                    new WarningMessageModal("Choose a name that has not been used for a column", "Unique Name needed");
+                warning.ShowModal(this);
+            }
+            else if (_newName != null)
             {
                 _controller.RenameHeader(_oldName, _newName, _column, _index);
                 base.OnOKButtonClicked();

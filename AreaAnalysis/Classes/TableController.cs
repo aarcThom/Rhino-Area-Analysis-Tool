@@ -29,6 +29,12 @@ namespace AreaAnalysis.Classes
         }
 
         // PUBLIC METHODS =======================================================================================
+
+        public int GetRowIndex(TableObject tObject)
+        {
+            return _dTable.IndexOf(tObject);
+        }
+        
         public void AddColumn()
         {
             if (_dTable.Count == 0)
@@ -89,6 +95,24 @@ namespace AreaAnalysis.Classes
             _gView.Columns.RemoveAt(colIndex);
         }
 
+        public void DeleteRow(List<int> indices)
+        {
+            if (_dTable.Count > indices.Count)
+            {
+                indices.Reverse();
+                foreach (var row in indices)
+                {
+                    _dTable.RemoveAt(row);
+                }
+            }
+            else
+            {
+                WarningMessageModal warning =
+                    new WarningMessageModal("The data table requires at least one row.", "Zero rows not allowed");
+                    warning.ShowModal(_gView);
+            }
+            
+        }
 
         // PRIVATE METHODS ======================================================================================
 
@@ -105,8 +129,10 @@ namespace AreaAnalysis.Classes
             if (isLink)
             {
                 TableObject newTObject = new TableObject();
+                string linkName = newTObject.GetLinkName();
+
                 _dTable.Add(newTObject);
-                GridColumn gCol = EtoMethods.AddLinkColumn(_gView);
+                GridColumn gCol = EtoMethods.AddLinkColumn(_gView, linkName);
                 _gView.Columns.Add(gCol);
             }
             else if (propType != null)
@@ -128,8 +154,10 @@ namespace AreaAnalysis.Classes
             if (isLink)
             {
                 TableObject newTObject = new TableObject();
+                string linkName = newTObject.GetLinkName();
+
                 _dTable.Add(newTObject);
-                GridColumn gCol = EtoMethods.AddLinkColumn(_gView);
+                GridColumn gCol = EtoMethods.AddLinkColumn(_gView, linkName);
                 _gView.Columns.Add(gCol);
             }
             else if (propType != null)
