@@ -12,30 +12,54 @@ namespace AreaAnalysis.Views
 {
     public class CellContext : ContextMenu
     {
-        public CellContext(List<int> selectedRows, TableController tController)
+        public CellContext(List<int> selectedRows, int selectedColumn, TableController tController, GridView gView)
         {
             int rowCount = selectedRows.Count();
 
-            //buttons for all row selected counts
-             ButtonMenuItem deleteHeadBut = new ButtonMenuItem();
-
-
-            if (rowCount == 1)
+            //delete Row Button
+             ButtonMenuItem deleteRowBut = new ButtonMenuItem();
+             
+             if (rowCount == 1)
             {
-                deleteHeadBut.Text = "Delete selected Row";
+                deleteRowBut.Text = "Delete selected Row";
             }
             else if (rowCount > 1)
             {
-                deleteHeadBut.Text = "Delete selected " + rowCount.ToString() + " rows";
+                deleteRowBut.Text = "Delete selected " + rowCount.ToString() + " rows";
             }
 
 
-            deleteHeadBut.Click += (sender, e) =>
+            deleteRowBut.Click += (sender, e) =>
             {
                 tController.DeleteRow(selectedRows);
             };
 
-            Items.Add(deleteHeadBut);
+            Items.Add(deleteRowBut);
+
+            // rename cells button
+            ButtonMenuItem renameCellsBut = new ButtonMenuItem();
+
+            string headerName = gView.Columns[selectedColumn].HeaderText;
+
+            if (rowCount == 1)
+            {
+                renameCellsBut.Text = "Change selected cell value in column '" + headerName + "'";
+            }
+            else if (rowCount > 1)
+            {
+                renameCellsBut.Text = "Change selected cell values for " + rowCount.ToString() + 
+                                   " selected rows in column '" + headerName + "'";
+            }
+
+            renameCellsBut.Click += (sender, e) =>
+            {
+                RhinoApp.WriteLine("whatever");
+            };
+
+            if (headerName != new TableObject().GetLinkName()) // we can't rename the link status column
+            {
+                Items.Add(renameCellsBut);
+            }
             
         }
     }

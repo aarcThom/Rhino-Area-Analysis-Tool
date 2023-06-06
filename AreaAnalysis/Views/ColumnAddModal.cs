@@ -35,7 +35,7 @@ namespace AreaAnalysis.Views
             Title = "Add a column";
 
             //getting table object info
-            List<string> fieldNames = _tableObject.GetFieldsNames();
+            List<string> fieldNames = _tableObject.GetPropertiesNames();
             List<string> fieldDescriptions = _tableObject.GetFieldsDescriptions();
             (_existingKeys, _linkName) = _tableObject.GetKeys();
 

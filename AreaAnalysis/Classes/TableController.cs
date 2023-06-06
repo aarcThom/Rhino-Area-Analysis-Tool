@@ -70,7 +70,7 @@ namespace AreaAnalysis.Classes
             {
                 foreach (var tObj in _dTable)
                 {
-                    tObj.ChangeField(dictType, oldName, newName);
+                    tObj.ChangeColumnName(oldName, newName);
                 }
 
                 //relink the eto column
@@ -82,14 +82,9 @@ namespace AreaAnalysis.Classes
 
         public void DeleteColumn(string columnName, int colIndex)
         {
-            Type dictType = GetDictionaryValueType(columnName);
-
-            if (dictType != null)
+            foreach (var dObj in _dTable)
             {
-                foreach (var dObj in _dTable)
-                {
-                    dObj.DeleteField(dictType, columnName);
-                }
+                dObj.DeleteColumn(columnName);
             }
 
             _gView.Columns.RemoveAt(colIndex);
@@ -112,6 +107,11 @@ namespace AreaAnalysis.Classes
                     warning.ShowModal(_gView);
             }
             
+        }
+
+        public void RenameCells(List<int> rowIndices, string colName)
+        {
+
         }
 
         // PRIVATE METHODS ======================================================================================
@@ -140,7 +140,7 @@ namespace AreaAnalysis.Classes
                 //update existing instances
                 foreach (var existingObj in _dTable)
                 {
-                    existingObj.AddNewField(propType, userName);
+                    existingObj.AddNewColumnToField(propType, userName);
                 }
                 GridColumn gCol = EtoMethods.AddColumn(_gView, propType, userName);
                 _gView.Columns.Add(gCol);

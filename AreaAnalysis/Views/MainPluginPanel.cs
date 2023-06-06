@@ -23,7 +23,9 @@ using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Dynamic;
 using System.Reflection;
+using Cell = Eto.Forms.Cell;
 using Color = Eto.Drawing.Color;
+using Font = Eto.Drawing.Font;
 
 namespace AreaAnalysis.Views
 {
@@ -46,7 +48,6 @@ namespace AreaAnalysis.Views
             _mDocumentSn = documentSerialNumber;
             Title = GetType().Name;
 
-
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
 
             DataTable mainStore = new DataTable();
@@ -55,7 +56,8 @@ namespace AreaAnalysis.Views
             var roomTable = new GridView
             {
                 AllowColumnReordering = true,
-                AllowMultipleSelection = true
+                AllowMultipleSelection = true,
+                
             };
 
             roomTable.DataStore = mainStore;
@@ -63,6 +65,7 @@ namespace AreaAnalysis.Views
             // data table display settings
             roomTable.GridLines = GridLines.Both;
             roomTable.RowHeight = 20;
+
 
             //initializing the data controller
             TableController tableController = new TableController(mainStore, this, roomTable);

@@ -6,10 +6,20 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using AreaAnalysis.Views;
+using Eto;
+using Eto.Drawing;
 using Eto.Forms;
 using Rhino;
 using Rhino.Geometry;
+using Binding = Eto.Forms.Binding;
+using Control = Eto.Forms.Control;
+using GroupBox = Eto.Forms.GroupBox;
+using Keys = Eto.Forms.Keys;
+using MouseButtons = Eto.Forms.MouseButtons;
+using MouseEventArgs = Eto.Forms.MouseEventArgs;
 
 namespace AreaAnalysis.Classes
 {
@@ -98,7 +108,7 @@ namespace AreaAnalysis.Classes
 
             if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None && e.Column >= 0 && e.Row >= 0)
             {
-                List<int> selectedIndices = new List<int>();
+                List<int> selectedRowIndices = new List<int>();
 
                 var selectedRows = gView.SelectedItems;
 
@@ -106,15 +116,15 @@ namespace AreaAnalysis.Classes
                 {
                     foreach (TableObject row in selectedRows)
                     {
-                        selectedIndices.Add(tControl.GetRowIndex(row));
+                        selectedRowIndices.Add(tControl.GetRowIndex(row));
                     }
                 }
                 else
                 {
-                    selectedIndices.Add(e.Row);
+                    selectedRowIndices.Add(e.Row);
                 }
 
-                CellContext cMenu = new CellContext(selectedIndices, tControl);
+                CellContext cMenu = new CellContext(selectedRowIndices, e.Column, tControl, gView);
                 cMenu.Show(gView, e.Location);
             }
 
@@ -146,5 +156,7 @@ namespace AreaAnalysis.Classes
                 cMenu.Show(gView, m.Location);
             }
         }
+
+
     }
 }
