@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -123,6 +124,7 @@ namespace AreaAnalysis.Classes
         // PROPERTIES =================================================================
 
         // the rhino link property
+
         public string LinkStatus { get; set; }
 
         // dictionaries for new multiple columns
@@ -277,11 +279,25 @@ namespace AreaAnalysis.Classes
         public void ChangeColumnName(string oldKey, string newKey)
         {
             Type type = GetKeyType(oldKey);
-            string value = _textField[oldKey];
+
+            //unfortunately I can't get around this - make sure to update
+            object[] newKeyArgs = null;
+            if (type == typeof(string))
+            {
+                newKeyArgs = new object[] { newKey, _textField[oldKey]};
+            } 
+            else if (type == typeof(int))
+            {
+                newKeyArgs = new object[] { newKey, _integerField[oldKey] };
+            }
+            else // if (type == typeof(float))
+            {
+                newKeyArgs = new object[] { newKey, _numberField[oldKey] };
+            }
 
             object[] oldKeyArgs = new object[] { oldKey };
-            object[] newKeyArgs = new object[] { newKey, value };
             Type[] overrides = new[] { typeof(string) };
+
 
             Generic(type, "Remove", "dict", oldKeyArgs);
             Generic(type, "Add", "dict", newKeyArgs);
@@ -456,6 +472,26 @@ namespace AreaAnalysis.Classes
             {
                 _numberFieldKeys[index] = key;
             }
+        }
+
+        //returns an index of whatever key is the correct type = messy but it works
+        private ((string, int, float), PropertyInfo) GenericGetKeyValue(Type type, string key)
+        {
+
+            PropertyInfo tupInfo;
+            if (type == typeof(string))
+            {
+                tupInfo = typeof(Tuple).GetProperty("Item1");
+            }
+            else if (type == typeof(int))
+            {
+                tupInfo = typeof(Tuple).GetProperty("Item2");
+            }
+            else // if (type = typeof(float))
+            {
+                tupInfo = typeof(Tuple).GetProperty("Item3");
+            }
+            return ((_textField[key], _integerField[key], _numberField[key]), tupInfo);
         }
 
     }
