@@ -14,19 +14,16 @@ namespace AreaAnalysis.Views
         private readonly DropDown _dropDownList;
         private readonly TextArea _dropDesc = new TextArea();
 
-        private Label _userNameLabel;
+        private readonly Label _userNameLabel;
 
         private readonly TextBox _userNameBox = new TextBox();
         private Color _textColor;
 
-        private string _chosenFieldName;
+        private Type _chosenType;
         private string _chosenUserName;
-        private readonly TableObject _tableObject = new TableObject();
 
-        private readonly List<string>_existingKeys;
-
-        private readonly string _linkName;
-        private bool _isLink = false;
+        private readonly List<string> _existingKeys;
+        private readonly List<Type> _existingTypes;
 
 
         public ColumnAddModal()
@@ -34,10 +31,13 @@ namespace AreaAnalysis.Views
             //Setting the modal title
             Title = "Add a column";
 
-            //getting table object info
-            List<string> fieldNames = _tableObject.GetPropertiesNames();
-            List<string> fieldDescriptions = _tableObject.GetFieldsDescriptions();
-            (_existingKeys, _linkName) = _tableObject.GetKeys();
+            Height = 250;
+
+            //getting cells info - ie. what type of cells have I implemented
+            (List<string> fieldNames, List<string> fieldDescriptions, List<Type> fieldTypes) = RowCell.GetColumns();
+
+            //getting the existing column names and types
+            (_existingKeys, _existingTypes) = RowDict.GetCurrentColumns();
 
             //getting the default text color
             _textColor = _userNameBox.TextColor;
@@ -46,6 +46,18 @@ namespace AreaAnalysis.Views
             Label dropLabel = new Label { Text = "What sort of column do you want to add?" };
 
             _dropDownList = new DropDown();
+
+            // removing option to add a second link column
+            if (_existingTypes.Contains(typeof(bool)))
+            {
+                int delIndex = fieldTypes.IndexOf(typeof(bool));
+                fieldTypes.RemoveAt(delIndex);
+                fieldDescriptions.RemoveAt(delIndex);
+                fieldNames.RemoveAt(delIndex);
+            }
+
+
+            // populating the dropdown list
             foreach (string name in fieldNames)
             {
                 _dropDownList.Items.Add(name);
@@ -57,9 +69,9 @@ namespace AreaAnalysis.Views
             _dropDesc.Width = 220;
 
             //closing event for dropdown
-            _dropDownList.DropDownClosed += (sender, args) => DropDown_Closed(fieldNames, fieldDescriptions);
+            _dropDownList.DropDownClosed += (sender, args) => DropDown_Closed(fieldTypes, fieldDescriptions);
             //opening event for dropdown
-            _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(fieldNames, fieldDescriptions);
+            _dropDownList.LoadComplete += (sender, args) => DropDown_Closed(fieldTypes, fieldDescriptions);
 
 
             //adding the text field for the user name and label
@@ -79,12 +91,12 @@ namespace AreaAnalysis.Views
         }
 
         // get the info
-        public (string, string, bool) GetColumnInfo() => (_chosenFieldName, _chosenUserName, _isLink);
+        public (Type, string) GetColumnInfo() => (_chosenType, _chosenUserName);
 
         //wiping return info if cancelled
         protected override void OnCancelButtonClicked()
         {
-            _chosenFieldName = null;
+            _chosenType = null;
             _chosenUserName = null;
 
             base.OnCancelButtonClicked();
@@ -94,7 +106,7 @@ namespace AreaAnalysis.Views
         protected override void OnOKButtonClicked()
         {
 
-            if (_userNameBox.Text == "" && _isLink == false)
+            if (_userNameBox.Text == "" && _chosenType != typeof(bool))
             {
                 WarningMessageModal warning = new WarningMessageModal("You must define column name",
                     "Empty column name");
@@ -112,18 +124,17 @@ namespace AreaAnalysis.Views
             }
         }
 
-        private void DropDown_Closed(List<string> fNames, List<string> fDescriptions)
+        private void DropDown_Closed(List<Type> fTypes, List<string> fDescriptions)
         {
             int choiceIndex = _dropDownList.SelectedIndex;
 
-            _chosenFieldName = fNames[choiceIndex];
+            _chosenType = fTypes[choiceIndex];
             _dropDesc.Text = fDescriptions[choiceIndex];
 
 
             // hiding column name for special column types
-            if (_chosenFieldName == _linkName)
+            if (_chosenType == typeof(bool))
             {
-                _isLink = true;
 
                 _userNameBox.Enabled = false;
                 _userNameBox.Visible = false;
@@ -135,7 +146,6 @@ namespace AreaAnalysis.Views
             }
             else
             {
-                _isLink = false;
 
                 _userNameBox.Enabled = true;
                 _userNameBox.Visible = true;

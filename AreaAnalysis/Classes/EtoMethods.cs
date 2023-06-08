@@ -22,7 +22,7 @@ using MouseButtons = Eto.Forms.MouseButtons;
 using MouseEventArgs = Eto.Forms.MouseEventArgs;
 
 namespace AreaAnalysis.Classes
-{
+{ /*
     class EtoMethods
     {
 
@@ -158,5 +158,5 @@ namespace AreaAnalysis.Classes
         }
 
 
-    }
+    } */
 }

@@ -31,7 +31,7 @@ namespace AreaAnalysis.Classes
         // FIELDS ======================================================================================
 
 
-        private FieldDict<string, string> _textField = new FieldDict<string, string>();
+        private SuperscededRowDict<string, string> _textField = new SuperscededRowDict<string, string>();
 
         private readonly string _textFieldDesc =
             "Use this field type to name a room, give a room a unique ID, etc.";
@@ -41,7 +41,7 @@ namespace AreaAnalysis.Classes
         //static field to propagate to all classes
         private static List<string> _textFieldKeys = new List<string>();
 
-        private FieldDict<string, int> _integerField = new FieldDict<string, int>();
+        private SuperscededRowDict<string, int> _integerField = new SuperscededRowDict<string, int>();
 
         private readonly string _integerFieldDesc =
             "Use this field type to a non-tracked numerical integer values like room numbers";
@@ -52,7 +52,7 @@ namespace AreaAnalysis.Classes
         private static List<string> _integerFieldKeys = new List<string>();
 
 
-        private FieldDict<string, float> _numberField = new FieldDict<string, float>();
+        private SuperscededRowDict<string, float> _numberField = new SuperscededRowDict<string, float>();
 
         private readonly string _numberFieldDesc =
             "Use this field type to a non-tracked numerical floating point values like cost, area targets";
@@ -128,19 +128,19 @@ namespace AreaAnalysis.Classes
         public string LinkStatus { get; set; }
 
         // dictionaries for new multiple columns
-        public FieldDict<string, string> TextField
+        public SuperscededRowDict<string, string> TextField
         {
             get => _textField;
             set => SetPropertyValue(ref _textField, value, nameof(TextField));
         }
 
-        public FieldDict<string, int> IntegerField
+        public SuperscededRowDict<string, int> IntegerField
         {
             get => _integerField;
             set => SetPropertyValue(ref _integerField, value, nameof(IntegerField));
         }
 
-        public FieldDict<string, float> NumberField
+        public SuperscededRowDict<string, float> NumberField
         {
             get => _numberField;
             set => SetPropertyValue(ref _numberField, value, nameof(NumberField));
@@ -412,7 +412,7 @@ namespace AreaAnalysis.Classes
 
             if (valType == typeof(string))
             {
-                var enumType = (dataType == "dict") ? typeof(FieldDict<string,string>) : typeof(List<string>);
+                var enumType = (dataType == "dict") ? typeof(SuperscededRowDict<string,string>) : typeof(List<string>);
                 var genMethod = (overrideArgs == null) ? enumType.GetMethod(genericMethod) : 
                     enumType.GetMethod(genericMethod, overrideArgs);
 
@@ -428,7 +428,7 @@ namespace AreaAnalysis.Classes
             else if (valType == typeof(int))
             {
 
-                var enumType = (dataType == "dict") ? typeof(FieldDict<string, int>) : typeof(List<string>);
+                var enumType = (dataType == "dict") ? typeof(SuperscededRowDict<string, int>) : typeof(List<string>);
                 var genMethod = (overrideArgs == null) ? enumType.GetMethod(genericMethod) :
                     enumType.GetMethod(genericMethod, overrideArgs);
 
@@ -442,7 +442,7 @@ namespace AreaAnalysis.Classes
             }
             else //if (valType == typeof(float))
             {
-                var enumType = (dataType == "dict") ? typeof(FieldDict<string, float>) : typeof(List<string>);
+                var enumType = (dataType == "dict") ? typeof(SuperscededRowDict<string, float>) : typeof(List<string>);
                 var genMethod = (overrideArgs == null) ? enumType.GetMethod(genericMethod) :
                     enumType.GetMethod(genericMethod, overrideArgs);
 
@@ -472,26 +472,6 @@ namespace AreaAnalysis.Classes
             {
                 _numberFieldKeys[index] = key;
             }
-        }
-
-        //returns an index of whatever key is the correct type = messy but it works
-        private ((string, int, float), PropertyInfo) GenericGetKeyValue(Type type, string key)
-        {
-
-            PropertyInfo tupInfo;
-            if (type == typeof(string))
-            {
-                tupInfo = typeof(Tuple).GetProperty("Item1");
-            }
-            else if (type == typeof(int))
-            {
-                tupInfo = typeof(Tuple).GetProperty("Item2");
-            }
-            else // if (type = typeof(float))
-            {
-                tupInfo = typeof(Tuple).GetProperty("Item3");
-            }
-            return ((_textField[key], _integerField[key], _numberField[key]), tupInfo);
         }
 
     }

@@ -8,7 +8,7 @@ using Eto.Forms;
 using Rhino;
 
 namespace AreaAnalysis.Views
-{
+{ /*
     public class RenameHeaderModal : BaseModal
     {
         private string _newName = null;
@@ -68,5 +68,5 @@ namespace AreaAnalysis.Views
             }
 
         }
-    }
+    } */
 }

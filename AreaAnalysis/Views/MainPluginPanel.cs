@@ -26,6 +26,7 @@ using System.Reflection;
 using Cell = Eto.Forms.Cell;
 using Color = Eto.Drawing.Color;
 using Font = Eto.Drawing.Font;
+using TableCell = AreaAnalysis.Classes.RowCell;
 
 namespace AreaAnalysis.Views
 {
@@ -51,29 +52,48 @@ namespace AreaAnalysis.Views
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
 
             DataTable mainStore = new DataTable();
-            
+
             //linking the eto grid view
-            var roomTable = new GridView
+            var gridView = new GridView
             {
                 AllowColumnReordering = true,
                 AllowMultipleSelection = true,
                 
             };
 
-            roomTable.DataStore = mainStore;
+            gridView.DataStore = mainStore;
 
             // data table display settings
-            roomTable.GridLines = GridLines.Both;
-            roomTable.RowHeight = 20;
+            gridView.GridLines = GridLines.Both;
+            gridView.RowHeight = 20;
 
 
+            
             //initializing the data controller
-            TableController tableController = new TableController(mainStore, this, roomTable);
+            RevTableController tableController = new RevTableController(mainStore, this, gridView);
 
             // room table events--------------------------------------------------------------------
             // handle clicks on room table
 
+            //format the cells so link symbols are red and green
+            gridView.CellFormatting += (sender, e) =>
+            {
+                RowDict cell = e.Item as RowDict;
+                if (cell != null)
+                {
+                    if (cell[e.Column.HeaderText].CellValue == RowCell.UnLinkedSymbol)
+                    {
+                        e.ForegroundColor = Colors.Red;
+                    }
+                    else if (cell[e.Column.HeaderText].CellValue == RowCell.LinkedSymbol)
+                    {
+                        e.ForegroundColor = Colors.Green;
+                    }
+                }
+            };
 
+
+            /*
             roomTable.MouseDown += (sender, e) =>
             {
                 _mouse = e;
@@ -89,11 +109,12 @@ namespace AreaAnalysis.Views
             {
                 EtoMethods.HeaderClick(sender, e, this, tableController, _mouse);
             };
-            
+            */
+
 
             //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Add column" };
+            var testButton = new Button { Text = "Add a Column" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
@@ -101,26 +122,26 @@ namespace AreaAnalysis.Views
                 tableController.AddColumn();
             }
 
-            var testButton2 = new Button { Text = "Print hello objects" };
+            var testButton2 = new Button { Text = "Print row values" };
             testButton2.Click += (sender, e) => OnTestButton2();
 
             void OnTestButton2()
             {
-                foreach (var obj in mainStore)
+                foreach (var row in mainStore)
                 {
-                    RhinoApp.WriteLine(obj.TextField["hello"].ToString());
+                    RhinoApp.WriteLine("++++++++++++");
+                    foreach (var val in row.Values)
+                    {
+                        RhinoApp.Write(val.CellValue);
+                    }
                 }
             }
 
-            var testButton3 = new Button { Text = "Change a table object" };
+            var testButton3 = new Button { Text = "Get master keys" };
             testButton3.Click += (sender, e) => OnTestButton3();
 
             void OnTestButton3()
             {
-                foreach (var obj in mainStore)
-                {
-                    obj.TextField["hello"] = "chooooo";
-                }
             }
 
             var testButton4 = new Button { Text = "Add row" };
@@ -153,7 +174,7 @@ namespace AreaAnalysis.Views
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
             //layout.AddSeparateRow(addColumnButton, null);
-            layout.Add(roomTable, yscale: true);
+            layout.Add(gridView, yscale: true);
             layout.Add(null);
             Content = layout;
 

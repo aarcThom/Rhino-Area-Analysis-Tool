@@ -7,7 +7,7 @@ using AreaAnalysis.Classes;
 using Eto.Forms;
 
 namespace AreaAnalysis.Views
-{
+{ /*
     public class DeleteColumnModal : BaseModal
     {
         private readonly string _colName;
@@ -34,5 +34,5 @@ namespace AreaAnalysis.Views
         }
 
 
-    }
+    } */
 }

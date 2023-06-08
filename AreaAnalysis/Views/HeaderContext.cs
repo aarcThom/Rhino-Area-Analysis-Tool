@@ -9,7 +9,7 @@ using Eto.Forms;
 using Rhino;
 
 namespace AreaAnalysis.Views
-{
+{ /*
     public class HeaderContext : ContextMenu
     {
         public HeaderContext(string headerName, Control blockedMenu, TableController tControl, 
@@ -48,5 +48,5 @@ namespace AreaAnalysis.Views
             Items.Add(deleteHeadBut);
             
         }
-    }
+    } */
 }

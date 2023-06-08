@@ -10,7 +10,7 @@ using Eto.Forms;
 using Rhino;
 
 namespace AreaAnalysis.Classes
-{
+{ /*
     public class TableController
     {
         // FIELDS ==============================================================================================
@@ -30,9 +30,9 @@ namespace AreaAnalysis.Classes
 
         // PUBLIC METHODS =======================================================================================
 
-        public int GetRowIndex(TableObject tObject)
+        public int GetRowIndex(RowDict row)
         {
-            return _dTable.IndexOf(tObject);
+            return _dTable.IndexOf(row);
         }
         
         public void AddColumn()
@@ -229,5 +229,5 @@ namespace AreaAnalysis.Classes
 
             return dictType;
         }
-    }
+    } */
 }

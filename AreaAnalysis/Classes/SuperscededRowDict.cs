@@ -8,7 +8,7 @@ using Rhino;
 
 namespace AreaAnalysis.Classes
 {
-    public class FieldDict<TKey, TValue> : Dictionary<TKey, TValue>, INotifyPropertyChanged
+    public class SuperscededRowDict<TKey, TValue> : Dictionary<TKey, TValue>, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -21,6 +21,8 @@ namespace AreaAnalysis.Classes
                 if (base.ContainsKey(key))
                 {
                     TValue oldValue = base[key];
+
+
                     if (!EqualityComparer<TValue>.Default.Equals(oldValue, value))
                     {
                         base[key] = value;

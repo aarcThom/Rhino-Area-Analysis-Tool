@@ -11,7 +11,7 @@ using Rhino;
 namespace AreaAnalysis.Views
 {
     public class CellContext : ContextMenu
-    {
+    { /*
         public CellContext(List<int> selectedRows, int selectedColumn, TableController tController, GridView gView)
         {
             int rowCount = selectedRows.Count();
@@ -61,6 +61,6 @@ namespace AreaAnalysis.Views
                 Items.Add(renameCellsBut);
             }
             
-        }
-    }
+        }*/
+    } 
 }
