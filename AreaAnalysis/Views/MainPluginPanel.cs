@@ -64,7 +64,7 @@ namespace AreaAnalysis.Views
             gridView.DataStore = mainStore;
 
             // data table display settings
-            gridView.GridLines = GridLines.Both;
+            //gridView.GridLines = GridLines.Both;
             gridView.RowHeight = 20;
 
 
@@ -92,6 +92,15 @@ namespace AreaAnalysis.Views
                 }
             };
 
+            //adding alternating background colors
+            gridView.CellFormatting += (sender, e) =>
+            {
+                if (e.Row % 2 == 0)
+                {
+                    e.BackgroundColor = Color.Parse("#ccecff");
+                }
+            };
+
 
             /*
             roomTable.MouseDown += (sender, e) =>
@@ -104,7 +113,7 @@ namespace AreaAnalysis.Views
                 EtoMethods.CellClick(sender, e, this, tableController);
             };
 
-            
+
             roomTable.ColumnHeaderClick += (sender, e) =>
             {
                 EtoMethods.HeaderClick(sender, e, this, tableController, _mouse);
@@ -112,9 +121,9 @@ namespace AreaAnalysis.Views
             */
 
 
-            //TEST BUTTON ==============================================================================================================
+                //TEST BUTTON ==============================================================================================================
 
-            var testButton = new Button { Text = "Add a Column" };
+                var testButton = new Button { Text = "Add a Column" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
