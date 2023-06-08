@@ -102,6 +102,22 @@ namespace AreaAnalysis.Views
             };
 
 
+            //header right click
+            gridView.MouseDown += (sender, args) =>
+            {
+                string columns = "";
+                foreach (var col in gridView.Columns)
+                {
+                    columns += $"{col.HeaderText}__"; 
+                }
+                RhinoApp.WriteLine(columns);    
+
+                if (args.Buttons == MouseButtons.Alternate && args.Location.Y <= gridView.RowHeight)
+                {
+                   
+                }
+            };
+
             /*
             roomTable.MouseDown += (sender, e) =>
             {
@@ -121,9 +137,9 @@ namespace AreaAnalysis.Views
             */
 
 
-                //TEST BUTTON ==============================================================================================================
+            //TEST BUTTON ==============================================================================================================
 
-                var testButton = new Button { Text = "Add a Column" };
+            var testButton = new Button { Text = "Add a Column" };
             testButton.Click += (sender, e) => OnTestButton();
 
             void OnTestButton()
