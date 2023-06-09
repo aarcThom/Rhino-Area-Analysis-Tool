@@ -54,6 +54,24 @@ namespace AreaAnalysis.Classes
             }
         }
 
+        public void RenameHeader(string oldName, string newName, GridColumn column, int index)
+        {
+            Type type = _dTable[0][oldName].GetType();
+
+            if (type != typeof(bool))
+            {
+                foreach (var row in _dTable)
+                {
+                    row.ChangeColumnName(oldName, newName);
+                }
+
+                //relink the eto column
+                GridColumn gCol = RevEtoMethods.AddColumn(_gView, newName, type);
+                _gView.Columns.RemoveAt(index);
+                _gView.Columns.Insert(index, gCol);
+            }
+        }
+
         // PRIVATE METHODS =======================================================================================
 
         private void AddColumnToEmpty()

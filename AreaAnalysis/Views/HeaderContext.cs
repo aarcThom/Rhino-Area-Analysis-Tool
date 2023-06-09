@@ -29,7 +29,7 @@ namespace AreaAnalysis.Views
 
                 renameHeadBut.Click += (sender, e) =>
                 {
-                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, headerNames);
+                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, headerNames, columnIndex);
                     renameHeader.ShowModal(blockedMenu);
 
                 };

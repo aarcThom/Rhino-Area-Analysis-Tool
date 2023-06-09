@@ -23,9 +23,15 @@ using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Dynamic;
 using System.Reflection;
+using System.Windows.Forms;
+using Button = Eto.Forms.Button;
 using Cell = Eto.Forms.Cell;
 using Color = Eto.Drawing.Color;
 using Font = Eto.Drawing.Font;
+using Label = Eto.Forms.Label;
+using MouseEventArgs = Eto.Forms.MouseEventArgs;
+using Padding = Eto.Drawing.Padding;
+using Panel = Eto.Forms.Panel;
 using TableCell = AreaAnalysis.Classes.RowCell;
 
 namespace AreaAnalysis.Views
@@ -54,9 +60,6 @@ namespace AreaAnalysis.Views
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
 
-
-
-
             DataTable mainStore = new DataTable();
 
             //linking the eto grid view
@@ -64,23 +67,20 @@ namespace AreaAnalysis.Views
             {
                 AllowColumnReordering = true,
                 AllowMultipleSelection = true,
-                
+                DataStore = mainStore,
+                RowHeight = 20,
+                Border = BorderType.Line
             };
 
 
-
-            gridView.DataStore = mainStore;
-
-            // data table display settings
-            //gridView.GridLines = GridLines.Both;
-            gridView.RowHeight = 20;
-
+            //drawable outline
+            /*
             var drawable = new Drawable
             {
                 Content = gridView,
-                Padding = new Padding(4)
+                Padding = new Padding(2)
             };
-            var pen = new Eto.Drawing.Pen(Colors.LightGrey, 4);
+            var pen = new Eto.Drawing.Pen(Colors.LightGrey, 2);
 
 
             drawable.Paint += (sender, e) =>
@@ -89,6 +89,7 @@ namespace AreaAnalysis.Views
                 var rect = new Eto.Drawing.Rectangle(new Eto.Drawing.Size(drawable.Size.Width-2,drawable.Size.Height - 2));
                 e.Graphics.DrawRectangle(pen, rect);
             };
+            */
 
 
             //initializing the data controller
@@ -114,14 +115,10 @@ namespace AreaAnalysis.Views
                 }
             };
 
-            //adding alternating background colors and bold header text
+            //adding alternating background colors
             gridView.CellFormatting += (sender, e) =>
             {
-                if (e.Row % 2 == 0)
-                {
-                    e.BackgroundColor = Color.Parse("#ccecff");
-                }
-
+                e.BackgroundColor = (e.Row % 2 == 0)? Color.Parse("#ccecff") : Colors.White;
             };
 
 
@@ -165,14 +162,19 @@ namespace AreaAnalysis.Views
 
             void OnTestButton2()
             {
+                int count = 1;
                 foreach (var row in mainStore)
                 {
-                    RhinoApp.WriteLine("++++++++++++");
+                    String leader = $"Row {count} = ";
                     foreach (var val in row.Values)
                     {
-                        RhinoApp.Write(val.CellValue);
+                        leader += $"{val.CellValue} / ";
                     }
+
+                    count++;
+                    RhinoApp.WriteLine(leader);
                 }
+                RhinoApp.WriteLine("-----------------------------");
             }
 
             var testButton3 = new Button { Text = "Get master keys" };
@@ -211,9 +213,9 @@ namespace AreaAnalysis.Views
             layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
-            layout.Add(drawable, yscale:true);
+            //layout.Add(drawable, yscale:true); if you want to surround the gview with a drawable
             //layout.AddSeparateRow(addColumnButton, null);
-            //layout.Add(gridView, yscale: true);
+            layout.Add(gridView, yscale: true);
             layout.Add(null);
             Content = layout;
 

@@ -12,14 +12,15 @@ namespace AreaAnalysis.Views
     public class RenameHeaderModal : BaseModal
     {
         private string _newName = null;
-        private RevTableController _controller;
-        private string _oldName;
-        private GridColumn _column;
-        private int _index;
-        private List<string> _headerNames;
+        private readonly RevTableController _controller;
+        private readonly string _oldName;
+        private readonly GridColumn _column;
+        private readonly int _index;
+        private readonly List<string> _headerNames;
 
         
-        public RenameHeaderModal(string currentHeader, RevTableController tControl, GridColumn column, List<string>headerNames)
+        public RenameHeaderModal(string currentHeader, RevTableController tControl, GridColumn column, 
+            List<string>headerNames,  int headerIndex)
         {
             //pass the controller
             _controller = tControl;
@@ -29,6 +30,8 @@ namespace AreaAnalysis.Views
             _column = column;
 
             _headerNames = headerNames;
+
+            _index = headerIndex;
 
             //modal title
             Title = "Rename header";
@@ -45,7 +48,7 @@ namespace AreaAnalysis.Views
 
         }
 
-        /*
+        
         protected override void OnOKButtonClicked()
         {
             if (_headerNames.Contains(_newName))
@@ -56,7 +59,7 @@ namespace AreaAnalysis.Views
                 warning.ShowModal(this);
             }
             else if (_newName != null)
-            {
+            { 
                 _controller.RenameHeader(_oldName, _newName, _column, _index);
                 base.OnOKButtonClicked();
             }
@@ -68,6 +71,5 @@ namespace AreaAnalysis.Views
             }
 
         }
-        */
     }
 }
