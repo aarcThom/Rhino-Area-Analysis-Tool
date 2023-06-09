@@ -56,7 +56,7 @@ namespace AreaAnalysis.Classes
         public static void CellRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
             TableController tControl)
         {
-            GridView gView = sender as GridView;
+            GridView gView = sender as GridView; 
 
             List<int> selectedRowIndices = new List<int>();
 
@@ -76,6 +76,13 @@ namespace AreaAnalysis.Classes
 
             CellContext cMenu = new CellContext(selectedRowIndices, args.Column, tControl, gView);
             cMenu.Show(gView, args.Location);
+        }
+
+        public static void LinkRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
+            TableController tControl)
+        {
+            int rowIndex = args.Row;
+            tControl.SetLink(rowIndex);
         }
     }
 }

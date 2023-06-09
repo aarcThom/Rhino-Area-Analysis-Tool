@@ -125,13 +125,13 @@ namespace AreaAnalysis.Views
             };
 
 
-
+            //column context
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
                 EtoMethods.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
             };
 
-
+            //cell context for non-special rows
             gridView.CellClick += (sender, e) =>
             {
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
@@ -141,6 +141,15 @@ namespace AreaAnalysis.Views
                 }
             };
 
+            //cell context for link
+            gridView.CellClick += (sender, e) =>
+            {
+                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
+                                                        && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkColumnText())
+                {
+                    EtoMethods.LinkRightClick(sender, e, this, tableController);
+                }
+            };
 
 
             //TEST BUTTON ==============================================================================================================

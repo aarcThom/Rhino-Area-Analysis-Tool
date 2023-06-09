@@ -152,6 +152,20 @@ namespace AreaAnalysis.Classes
             return LinkColText;
         }
 
+        public void EnableLink()
+        {
+            if (_cellType == typeof(bool))
+            {
+                _linkVal = true;
+                OnPropertyChanged(nameof(CellValue));
+
+            }
+            else
+            {
+                throw new Exception("You cannot set link value in non Rhino link cell");
+            }
+        }
+
         public static (List<string> ColumnNames, List<string> ColumnDescriptions, List<Type> ColumnTypes) GetColumns()
         {
             // creating a shallow copy of fieldNames so I can add the linkName field

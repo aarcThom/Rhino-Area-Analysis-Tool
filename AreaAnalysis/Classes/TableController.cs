@@ -73,6 +73,12 @@ namespace AreaAnalysis.Classes
 
         }
 
+        public void SetLink(int rowIndex)
+        {
+            string linkKey = RowCell.GetLinkColumnText();
+            _dTable[rowIndex][linkKey].EnableLink();
+        }
+
         public void RenameHeader(string oldName, string newName, GridColumn column, int index)
         {
             Type type = _dTable[0][oldName].GetType();
