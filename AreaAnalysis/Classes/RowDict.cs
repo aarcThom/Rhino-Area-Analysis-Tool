@@ -174,6 +174,11 @@ namespace AreaAnalysis.Classes
 
         }
 
+        public void DeleteColumn(string colName)
+        {
+            this.Remove(colName);
+        }
+
         public static void AddColumnToMaster(string columnName, Type columnType)
         {
             MasterDictionary.Add(columnName, new RowCell(columnType));

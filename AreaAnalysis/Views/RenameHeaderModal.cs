@@ -12,14 +12,14 @@ namespace AreaAnalysis.Views
     public class RenameHeaderModal : BaseModal
     {
         private string _newName = null;
-        private readonly RevTableController _controller;
+        private readonly TableController _controller;
         private readonly string _oldName;
         private readonly GridColumn _column;
         private readonly int _index;
         private readonly List<string> _headerNames;
 
         
-        public RenameHeaderModal(string currentHeader, RevTableController tControl, GridColumn column, 
+        public RenameHeaderModal(string currentHeader, TableController tControl, GridColumn column, 
             List<string>headerNames,  int headerIndex)
         {
             //pass the controller

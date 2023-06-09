@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Eto.Drawing;
 using Eto.Forms;
+using Keys = Eto.Forms.Keys;
+using MouseButtons = Eto.Forms.MouseButtons;
+using MouseEventArgs = Eto.Forms.MouseEventArgs;
 
 namespace AreaAnalysis.Classes
 {
@@ -18,9 +24,12 @@ namespace AreaAnalysis.Classes
         }
     }
 
+
+
+
     public class RhinoGridView : GridView
-    {   
-        
+    {
+
         public event EventHandler<CustomGridColumnEventArgs> ColumnHeaderRightClick;
 
         protected virtual void OnColumnHeaderRightClick(CustomGridColumnEventArgs e)

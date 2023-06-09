@@ -28,7 +28,9 @@ using Button = Eto.Forms.Button;
 using Cell = Eto.Forms.Cell;
 using Color = Eto.Drawing.Color;
 using Font = Eto.Drawing.Font;
+using Keys = Eto.Forms.Keys;
 using Label = Eto.Forms.Label;
+using MouseButtons = Eto.Forms.MouseButtons;
 using MouseEventArgs = Eto.Forms.MouseEventArgs;
 using Padding = Eto.Drawing.Padding;
 using Panel = Eto.Forms.Panel;
@@ -44,13 +46,6 @@ namespace AreaAnalysis.Views
 
         // Provide easy access to the SampleCsEtoPanel.GUID
         public static Guid PanelId => typeof(MainPluginPanel).GUID;
-
-        //Mouse event field for interacting with gridview
-        private MouseEventArgs _mouse;
-
-        private int _panelWidth;
-
-
 
         public MainPluginPanel(uint documentSerialNumber)
         {
@@ -93,7 +88,7 @@ namespace AreaAnalysis.Views
 
 
             //initializing the data controller
-            RevTableController tableController = new RevTableController(mainStore, this, gridView);
+            TableController tableController = new TableController(mainStore, this, gridView);
 
             // room table events--------------------------------------------------------------------
             // handle clicks on room table
@@ -121,30 +116,31 @@ namespace AreaAnalysis.Views
                 e.BackgroundColor = (e.Row % 2 == 0)? Color.Parse("#ccecff") : Colors.White;
             };
 
+            gridView.SelectedRowsChanged += (sender, e) =>
+            {
+                foreach (var row in gridView.SelectedRows)
+                {
+                    RhinoApp.WriteLine(row.ToString());
+                }
+            };
+
 
 
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
-                RevEtoMethods.HeaderClick(sender, e.Column, tableController, e.MouseArgs);
+                EtoMethods.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
             };
 
-            /*
-            roomTable.MouseDown += (sender, e) =>
+
+            gridView.CellClick += (sender, e) =>
             {
-                _mouse = e;
+                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
+                                                        && e.Column >= 0 && e.Row >= 0)
+                {
+                    EtoMethods.CellRightClick(sender, e, this, tableController);
+                }
             };
 
-            roomTable.CellClick += (sender, e) =>
-            {
-                EtoMethods.CellClick(sender, e, this, tableController);
-            };
-
-
-            roomTable.ColumnHeaderClick += (sender, e) =>
-            {
-                EtoMethods.HeaderClick(sender, e, this, tableController, _mouse);
-            };
-            */
 
 
             //TEST BUTTON ==============================================================================================================

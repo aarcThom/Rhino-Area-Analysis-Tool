@@ -12,7 +12,7 @@ namespace AreaAnalysis.Views
 { 
     public class HeaderContext : ContextMenu
     {
-        public HeaderContext(Control blockedMenu, RevTableController tControl, 
+        public HeaderContext(Control blockedMenu, TableController tControl, 
             GridColumn column, List<string> headerNames)
         {
             string headerName = column.HeaderText;
@@ -48,7 +48,7 @@ namespace AreaAnalysis.Views
 
             deleteHeadBut.Click += (sender, e) =>
             {
-                DeleteColumnModal deleteCol = new DeleteColumnModal(headerName, tControl);
+                DeleteColumnModal deleteCol = new DeleteColumnModal(headerName, tControl, columnIndex);
                 deleteCol.ShowModal(blockedMenu);
             };
 

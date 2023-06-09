@@ -11,7 +11,7 @@ using Rhino;
 namespace AreaAnalysis.Views
 {
     public class CellContext : ContextMenu
-    { /*
+    { 
         public CellContext(List<int> selectedRows, int selectedColumn, TableController tController, GridView gView)
         {
             int rowCount = selectedRows.Count();
@@ -56,11 +56,11 @@ namespace AreaAnalysis.Views
                 RhinoApp.WriteLine("whatever");
             };
 
-            if (headerName != new TableObject().GetLinkName()) // we can't rename the link status column
+            if (headerName != RowCell.GetLinkColumnText()) // we can't rename the link status column
             {
                 Items.Add(renameCellsBut);
             }
             
-        }*/
+        }
     } 
 }
