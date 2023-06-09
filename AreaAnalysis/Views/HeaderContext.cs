@@ -9,21 +9,27 @@ using Eto.Forms;
 using Rhino;
 
 namespace AreaAnalysis.Views
-{ /*
+{ 
     public class HeaderContext : ContextMenu
     {
-        public HeaderContext(string headerName, Control blockedMenu, TableController tControl, 
-            GridColumn column, int index, List<string> headerNames)
+        public HeaderContext(Control blockedMenu, RevTableController tControl, 
+            GridColumn column, List<string> headerNames)
         {
+            string headerName = column.HeaderText;
+
+            //getting the column index
+            GridView gView = (GridView)blockedMenu;
+            int columnIndex = gView.Columns.IndexOf(column);
+
             // allowable functions for non-link columns
-            if (headerName != "Rhino Link")
+            if (headerName != RowCell.GetLinkColumnText())
             {
                 ButtonMenuItem renameHeadBut = new ButtonMenuItem() { Text = "Rename header \"" + headerName + "\"" };
                 ButtonMenuItem addDependentBut = new ButtonMenuItem() { Text = "Add dependent column to \"" + headerName + "\"" };
 
                 renameHeadBut.Click += (sender, e) =>
                 {
-                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, index, headerNames);
+                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, headerNames);
                     renameHeader.ShowModal(blockedMenu);
 
                 };
@@ -34,6 +40,7 @@ namespace AreaAnalysis.Views
                 Items.Add(addDependentBut);
             }
 
+
             //allowable functions for all!
 
             ButtonMenuItem deleteHeadBut = new ButtonMenuItem() { Text = "Delete header \"" + headerName + "\"" };
@@ -41,12 +48,11 @@ namespace AreaAnalysis.Views
 
             deleteHeadBut.Click += (sender, e) =>
             {
-                DeleteColumnModal deleteCol = new DeleteColumnModal(headerName, index, tControl);
+                DeleteColumnModal deleteCol = new DeleteColumnModal(headerName, tControl);
                 deleteCol.ShowModal(blockedMenu);
             };
 
             Items.Add(deleteHeadBut);
-            
         }
-    } */
+    } 
 }

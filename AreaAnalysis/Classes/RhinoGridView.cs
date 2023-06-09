@@ -18,13 +18,14 @@ namespace AreaAnalysis.Classes
         }
     }
 
-    public class CustomGridView : GridView
-    {
-        public event EventHandler<CustomGridColumnEventArgs> CustomColumnHeaderClick;
+    public class RhinoGridView : GridView
+    {   
+        
+        public event EventHandler<CustomGridColumnEventArgs> ColumnHeaderRightClick;
 
-        protected virtual void OnCustomColumnHeaderClick(CustomGridColumnEventArgs e)
+        protected virtual void OnColumnHeaderRightClick(CustomGridColumnEventArgs e)
         {
-            CustomColumnHeaderClick?.Invoke(this, e);
+            ColumnHeaderRightClick?.Invoke(this, e);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -37,11 +38,12 @@ namespace AreaAnalysis.Classes
                 GridColumn column = cell.Column;
 
                 var args = new CustomGridColumnEventArgs(column, e);
-                OnCustomColumnHeaderClick(args);
+                OnColumnHeaderRightClick(args);
 
                 base.OnColumnHeaderClick(new GridColumnEventArgs(column));
             }
         }
+
     }
 
 }

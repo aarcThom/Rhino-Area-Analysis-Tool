@@ -10,7 +10,7 @@ using Rhino;
 
 namespace AreaAnalysis.Classes
 {
-    internal class RevTableController
+    public class RevTableController
     {
         // FIELDS ==============================================================================================
         private DataTable _dTable;

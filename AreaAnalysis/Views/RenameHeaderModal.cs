@@ -8,17 +8,18 @@ using Eto.Forms;
 using Rhino;
 
 namespace AreaAnalysis.Views
-{ /*
+{ 
     public class RenameHeaderModal : BaseModal
     {
         private string _newName = null;
-        private TableController _controller;
+        private RevTableController _controller;
         private string _oldName;
         private GridColumn _column;
         private int _index;
         private List<string> _headerNames;
 
-        public RenameHeaderModal(string currentHeader, TableController tControl, GridColumn column, int index, List<string>headerNames)
+        
+        public RenameHeaderModal(string currentHeader, RevTableController tControl, GridColumn column, List<string>headerNames)
         {
             //pass the controller
             _controller = tControl;
@@ -26,8 +27,6 @@ namespace AreaAnalysis.Views
             _oldName = currentHeader;
 
             _column = column;
-
-            _index = index;
 
             _headerNames = headerNames;
 
@@ -46,6 +45,7 @@ namespace AreaAnalysis.Views
 
         }
 
+        /*
         protected override void OnOKButtonClicked()
         {
             if (_headerNames.Contains(_newName))
@@ -68,5 +68,6 @@ namespace AreaAnalysis.Views
             }
 
         }
-    } */
+        */
+    }
 }

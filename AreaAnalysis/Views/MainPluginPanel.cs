@@ -42,6 +42,9 @@ namespace AreaAnalysis.Views
         //Mouse event field for interacting with gridview
         private MouseEventArgs _mouse;
 
+        private int _panelWidth;
+
+
 
         public MainPluginPanel(uint documentSerialNumber)
         {
@@ -57,18 +60,36 @@ namespace AreaAnalysis.Views
             DataTable mainStore = new DataTable();
 
             //linking the eto grid view
-            var gridView = new CustomGridView
+            var gridView = new RhinoGridView
             {
                 AllowColumnReordering = true,
                 AllowMultipleSelection = true,
                 
             };
 
+
+
             gridView.DataStore = mainStore;
 
             // data table display settings
             //gridView.GridLines = GridLines.Both;
             gridView.RowHeight = 20;
+
+            var drawable = new Drawable
+            {
+                Content = gridView,
+                Padding = new Padding(4)
+            };
+            var pen = new Eto.Drawing.Pen(Colors.LightGrey, 4);
+
+
+            drawable.Paint += (sender, e) =>
+            {
+
+                var rect = new Eto.Drawing.Rectangle(new Eto.Drawing.Size(drawable.Size.Width-2,drawable.Size.Height - 2));
+                e.Graphics.DrawRectangle(pen, rect);
+            };
+
 
             //initializing the data controller
             RevTableController tableController = new RevTableController(mainStore, this, gridView);
@@ -93,19 +114,21 @@ namespace AreaAnalysis.Views
                 }
             };
 
-            //adding alternating background colors
+            //adding alternating background colors and bold header text
             gridView.CellFormatting += (sender, e) =>
             {
                 if (e.Row % 2 == 0)
                 {
                     e.BackgroundColor = Color.Parse("#ccecff");
                 }
+
             };
 
 
-            gridView.CustomColumnHeaderClick += (sender, e) =>
+
+            gridView.ColumnHeaderRightClick += (sender, e) =>
             {
-                RhinoApp.WriteLine(e.Column.HeaderText);
+                RevEtoMethods.HeaderClick(sender, e.Column, tableController, e.MouseArgs);
             };
 
             /*
@@ -181,15 +204,16 @@ namespace AreaAnalysis.Views
 
             // PANEL LAYOUT ==============================================================================================================
 
-            var layout = new DynamicLayout { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10) };
+            var layout = new DynamicLayout() { DefaultSpacing = new Eto.Drawing.Size(5, 5), Padding = new Padding(10)};
             layout.AddSeparateRow(testButton, testButton2, testButton3,testButton4, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Excel Document" });
             layout.AddSeparateRow(excelFilePath, new Label { Text = "---->" }, importExcel, null);
             layout.AddSeparateRow(new EtoDivider());
             layout.AddSeparateRow(new Label { Text = "Rhino Objects Table" });
+            layout.Add(drawable, yscale:true);
             //layout.AddSeparateRow(addColumnButton, null);
-            layout.Add(gridView, yscale: true);
+            //layout.Add(gridView, yscale: true);
             layout.Add(null);
             Content = layout;
 

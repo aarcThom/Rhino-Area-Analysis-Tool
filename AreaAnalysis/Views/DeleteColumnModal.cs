@@ -7,17 +7,15 @@ using AreaAnalysis.Classes;
 using Eto.Forms;
 
 namespace AreaAnalysis.Views
-{ /*
+{ 
     public class DeleteColumnModal : BaseModal
     {
         private readonly string _colName;
-        private readonly int _colIndex;
 
-        private readonly TableController _tControl;
-        public DeleteColumnModal(string colName, int colIndex, TableController tControl)
+        private readonly RevTableController _tControl;
+        public DeleteColumnModal(string colName, RevTableController tControl)
         {
             _colName = colName;
-            _colIndex = colIndex;
 
             _tControl = tControl;
 
@@ -27,12 +25,14 @@ namespace AreaAnalysis.Views
             ModalLayout.Items.Insert(0, label);
         }
 
+        /*
         protected override void OnOKButtonClicked()
         {
             _tControl.DeleteColumn(_colName, _colIndex);
             base.OnOKButtonClicked();
         }
+        */
 
 
-    } */
+    } 
 }
