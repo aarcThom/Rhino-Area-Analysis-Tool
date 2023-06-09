@@ -51,10 +51,13 @@ namespace AreaAnalysis.Views
 
             // SETTING UP DOCUMENT TABLE AND GRID VIEW =================================================================================
 
+
+
+
             DataTable mainStore = new DataTable();
 
             //linking the eto grid view
-            var gridView = new GridView
+            var gridView = new CustomGridView
             {
                 AllowColumnReordering = true,
                 AllowMultipleSelection = true,
@@ -67,8 +70,6 @@ namespace AreaAnalysis.Views
             //gridView.GridLines = GridLines.Both;
             gridView.RowHeight = 20;
 
-
-            
             //initializing the data controller
             RevTableController tableController = new RevTableController(mainStore, this, gridView);
 
@@ -102,20 +103,9 @@ namespace AreaAnalysis.Views
             };
 
 
-            //header right click
-            gridView.MouseDown += (sender, args) =>
+            gridView.CustomColumnHeaderClick += (sender, e) =>
             {
-                string columns = "";
-                foreach (var col in gridView.Columns)
-                {
-                    columns += $"{col.HeaderText}__"; 
-                }
-                RhinoApp.WriteLine(columns);    
-
-                if (args.Buttons == MouseButtons.Alternate && args.Location.Y <= gridView.RowHeight)
-                {
-                   
-                }
+                RhinoApp.WriteLine(e.Column.HeaderText);
             };
 
             /*
