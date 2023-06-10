@@ -16,6 +16,9 @@ namespace AreaAnalysis.Classes
         // used to keep all rows in sync on init
         private static readonly Dictionary<string, RowCell> MasterDictionary = new Dictionary<string, RowCell>(); 
 
+        // name value for special name column & column name
+        public static string NameHeaderText = "Name";
+
 
         // Event handlers ==========================================================================
         public event PropertyChangedEventHandler PropertyChanged;
@@ -184,4 +187,6 @@ namespace AreaAnalysis.Classes
             MasterDictionary.Add(columnName, new RowCell(columnType));
         }
     }
+
+    // PRIVATE METHODS ==================================================================
 }

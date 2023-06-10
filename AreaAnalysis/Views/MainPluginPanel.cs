@@ -90,6 +90,9 @@ namespace AreaAnalysis.Views
             //initializing the data controller
             TableController tableController = new TableController(mainStore, this, gridView);
 
+            //Intializing the data in the gridview
+            tableController.InitializeGridView();
+
             // room table events--------------------------------------------------------------------
             // handle clicks on room table
 
@@ -128,14 +131,19 @@ namespace AreaAnalysis.Views
             //column context
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
-                EtoMethods.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
+                if (e.Column.HeaderText != RowCell.GetLinkColumnText() && e.Column.HeaderText != RowDict.NameHeaderText)
+                {
+                    EtoMethods.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
+                }
             };
 
             //cell context for non-special rows
             gridView.CellClick += (sender, e) =>
             {
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
-                                                        && e.Column >= 0 && e.Row >= 0)
+                                                        && e.Column >= 0 && e.Row >= 0 
+                                                        && e.GridColumn.HeaderText != RowCell.GetLinkColumnText()
+                                                        && e.GridColumn.HeaderText !=RowDict.NameHeaderText)
                 {
                     EtoMethods.CellRightClick(sender, e, this, tableController);
                 }

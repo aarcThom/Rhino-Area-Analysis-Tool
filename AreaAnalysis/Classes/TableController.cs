@@ -28,17 +28,19 @@ namespace AreaAnalysis.Classes
 
         // PUBLIC METHODS =======================================================================================
 
+        public void InitializeGridView()
+        {
+            _dTable.Add(new RowDict());
+            AddColumnPrivate(RowDict.NameHeaderText, typeof(string));
+            AddColumnPrivate(RowCell.GetLinkColumnText(), typeof(bool));
+        }
+
         public void AddColumn()
         {
-            if (_dTable.Count == 0)
-            {
-                AddColumnToEmpty();
-            }
-            else
-            {
-                AddColumnToExisting();
-            }
+            (string colName, Type colType) = AddColumnModalInfo();
+            AddColumnPrivate(colName, colType);
         }
+
         public void DeleteColumn(string columnName, int colIndex)
         {
             foreach (var row in _dTable)
@@ -106,24 +108,8 @@ namespace AreaAnalysis.Classes
 
         // PRIVATE METHODS =======================================================================================
 
-        private void AddColumnToEmpty()
+        private void AddColumnPrivate(string colName, Type colType)
         {
-            (string colName, Type colType) = AddColumnModalInfo();
-
-            if (colName != null && colType != null)
-            {
-                RowDict row = new RowDict(colName, colType);
-                _dTable.Add(row);
-
-                GridColumn gColumn = EtoMethods.AddColumn(_gView, colName, colType);
-                _gView.Columns.Add(gColumn);
-            }
-        }
-
-        private void AddColumnToExisting()
-        {
-            (string colName, Type colType) = AddColumnModalInfo();
-
             if (colName != null && colType != null)
             {
                 // add new column to master dictionary

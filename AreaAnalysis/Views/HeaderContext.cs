@@ -21,30 +21,20 @@ namespace AreaAnalysis.Views
             GridView gView = (GridView)blockedMenu;
             int columnIndex = gView.Columns.IndexOf(column);
 
-            // allowable functions for non-link columns
-            if (headerName != RowCell.GetLinkColumnText())
-            {
-                ButtonMenuItem renameHeadBut = new ButtonMenuItem() { Text = "Rename header \"" + headerName + "\"" };
-                ButtonMenuItem addDependentBut = new ButtonMenuItem() { Text = "Add dependent column to \"" + headerName + "\"" };
 
-                renameHeadBut.Click += (sender, e) =>
-                {
-                    RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, headerNames, columnIndex);
-                    renameHeader.ShowModal(blockedMenu);
-
-                };
-
-                addDependentBut.Click += (sender, e) => RhinoApp.WriteLine("added dependent");
-
-                Items.Add(renameHeadBut);
-                Items.Add(addDependentBut);
-            }
-
-
-            //allowable functions for all!
-
+            ButtonMenuItem renameHeadBut = new ButtonMenuItem() { Text = "Rename header \"" + headerName + "\"" };
+            ButtonMenuItem addDependentBut = new ButtonMenuItem() { Text = "Add dependent column to \"" + headerName + "\"" };
             ButtonMenuItem deleteHeadBut = new ButtonMenuItem() { Text = "Delete header \"" + headerName + "\"" };
 
+
+            renameHeadBut.Click += (sender, e) =>
+            {
+                RenameHeaderModal renameHeader = new RenameHeaderModal(headerName, tControl, column, headerNames, columnIndex);
+                renameHeader.ShowModal(blockedMenu);
+
+            };
+
+            addDependentBut.Click += (sender, e) => RhinoApp.WriteLine("added dependent");
 
             deleteHeadBut.Click += (sender, e) =>
             {
@@ -52,6 +42,8 @@ namespace AreaAnalysis.Views
                 deleteCol.ShowModal(blockedMenu);
             };
 
+            Items.Add(renameHeadBut);
+            Items.Add(addDependentBut);
             Items.Add(deleteHeadBut);
         }
     } 

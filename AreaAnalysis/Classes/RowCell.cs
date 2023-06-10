@@ -23,7 +23,7 @@ namespace AreaAnalysis.Classes
         public static readonly string UnLinkedSymbol = "❌";
         public static readonly string LinkedSymbol = "✔️";
 
-        private string _stringVal = "undefined";
+        private string _stringVal = "undefined"; // generic string default
 
         private int _intVal = 0;
 
