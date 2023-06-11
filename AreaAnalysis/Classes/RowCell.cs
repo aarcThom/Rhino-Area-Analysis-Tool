@@ -26,8 +26,8 @@ namespace AreaAnalysis.Classes
         //Rhino link
         private Guid _selectedBlock;
 
-
-        private string _stringVal = "undefined"; // generic string default
+        private static string _defaultStringVal = "undefined";
+        private string _stringVal; // generic string default per object
 
         private int _intVal = 0;
 
@@ -62,6 +62,7 @@ namespace AreaAnalysis.Classes
         public RowCell(Type cellType)
         {
             _cellType = cellType;
+            _stringVal = _defaultStringVal;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -154,6 +155,11 @@ namespace AreaAnalysis.Classes
         public static string GetLinkColumnText()
         {
             return LinkColText;
+        }
+
+        public bool CheckForDefaultName()
+        {
+            return _stringVal == _defaultStringVal;
         }
 
         public void EnableLink()

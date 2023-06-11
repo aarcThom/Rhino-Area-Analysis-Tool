@@ -106,6 +106,11 @@ namespace AreaAnalysis.Classes
             return _dTable.IndexOf(row);
         }
 
+        public bool RowUnnamed(int index)
+        {
+            return _dTable[index][RowDict.NameHeaderText].CheckForDefaultName();
+        }
+
         // PRIVATE METHODS =======================================================================================
 
         private void AddColumnPrivate(string colName, Type colType)

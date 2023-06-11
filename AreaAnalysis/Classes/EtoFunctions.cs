@@ -84,19 +84,33 @@ namespace AreaAnalysis.Classes
         public static void LinkRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
             TableController tControl)
         {
+            GridView gView = sender as GridView;
+
             int rowIndex = args.Row;
-            
-            (Result result, ObjRef[] objects) = RhinoFunctions.UserSelect();
 
-            if (result == Result.Success)
+            if (!tControl.RowUnnamed(rowIndex))
             {
-                foreach (var obj in objects)
-                {
-                    RhinoApp.WriteLine(obj.ObjectId.ToString());
-                }
+                (Result result, ObjRef[] objects) = RhinoFunctions.UserSelect();
 
-                tControl.SetLink(rowIndex);
+                if (result == Result.Success)
+                {
+                    foreach (var obj in objects)
+                    {
+                        RhinoApp.WriteLine(obj.ObjectId.ToString());
+                    }
+
+                    tControl.SetLink(rowIndex);
+                }
             }
+            else
+            {
+                WarningMessageModal warning =
+                    new WarningMessageModal("You must name the row before linking it",
+                        "Undefined row name");
+                warning.ShowModal(gView);
+            }
+            
+            
         }
     }
 }
