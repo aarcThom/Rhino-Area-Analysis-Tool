@@ -5,10 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AreaAnalysis.Views;
+using Rhino;
+using Rhino.Commands;
+using Rhino.DocObjects;
 
 namespace AreaAnalysis.Classes
 {
-    public class EtoMethods
+    public class EtoFunctions
     {
         public static GridColumn AddColumn(GridView gView, string columnName, Type columnType)
         {
@@ -82,7 +85,18 @@ namespace AreaAnalysis.Classes
             TableController tControl)
         {
             int rowIndex = args.Row;
-            tControl.SetLink(rowIndex);
+            
+            (Result result, ObjRef[] objects) = RhinoFunctions.UserSelect();
+
+            if (result == Result.Success)
+            {
+                foreach (var obj in objects)
+                {
+                    RhinoApp.WriteLine(obj.ObjectId.ToString());
+                }
+
+                tControl.SetLink(rowIndex);
+            }
         }
     }
 }

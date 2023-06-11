@@ -23,6 +23,10 @@ namespace AreaAnalysis.Classes
         public static readonly string UnLinkedSymbol = "❌";
         public static readonly string LinkedSymbol = "✔️";
 
+        //Rhino link
+        private Guid _selectedBlock;
+
+
         private string _stringVal = "undefined"; // generic string default
 
         private int _intVal = 0;

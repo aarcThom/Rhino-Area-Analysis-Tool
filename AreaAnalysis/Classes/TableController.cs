@@ -93,7 +93,7 @@ namespace AreaAnalysis.Classes
                 }
 
                 //relink the eto column
-                GridColumn gCol = EtoMethods.AddColumn(_gView, newName, type);
+                GridColumn gCol = EtoFunctions.AddColumn(_gView, newName, type);
                 _gView.Columns.RemoveAt(index);
                 _gView.Columns.Insert(index, gCol);
             }
@@ -121,7 +121,7 @@ namespace AreaAnalysis.Classes
                     row.Add(colName, new RowCell(colType));
                 }
 
-                GridColumn gColumn = EtoMethods.AddColumn(_gView, colName, colType);
+                GridColumn gColumn = EtoFunctions.AddColumn(_gView, colName, colType);
                 _gView.Columns.Add(gColumn);
             }
         }

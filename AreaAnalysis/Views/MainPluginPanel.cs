@@ -133,7 +133,7 @@ namespace AreaAnalysis.Views
             {
                 if (e.Column.HeaderText != RowCell.GetLinkColumnText() && e.Column.HeaderText != RowDict.NameHeaderText)
                 {
-                    EtoMethods.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
+                    EtoFunctions.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
                 }
             };
 
@@ -145,7 +145,7 @@ namespace AreaAnalysis.Views
                                                         && e.GridColumn.HeaderText != RowCell.GetLinkColumnText()
                                                         && e.GridColumn.HeaderText !=RowDict.NameHeaderText)
                 {
-                    EtoMethods.CellRightClick(sender, e, this, tableController);
+                    EtoFunctions.CellRightClick(sender, e, this, tableController);
                 }
             };
 
@@ -155,7 +155,7 @@ namespace AreaAnalysis.Views
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
                                                         && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkColumnText())
                 {
-                    EtoMethods.LinkRightClick(sender, e, this, tableController);
+                    EtoFunctions.LinkRightClick(sender, e, this, tableController);
                 }
             };
 
