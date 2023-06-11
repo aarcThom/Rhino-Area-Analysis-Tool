@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
+using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
 using Rhino.UI;
@@ -18,7 +19,17 @@ namespace AreaAnalysis.Classes
     {
         public static (Result, ObjRef[]) UserSelect()
         {
+            RhinoDoc doc = RhinoDoc.ActiveDoc;
+
+            // Phantoms, grips, lights, etc., cannot be in blocks.
+            const ObjectType forbiddenGeoFilter = ObjectType.Light |
+                                                  ObjectType.Grip | 
+                                                  ObjectType.Phantom;
+
+            const ObjectType geoFilter = forbiddenGeoFilter ^ ObjectType.AnyObject;
+
             GetObject go = new GetObject();
+            go.GeometryFilter = geoFilter;
             go.SetCommandPrompt("Select stuff");
             go.GroupSelect = true;
             go.SubObjectSelect = false;
@@ -26,7 +37,19 @@ namespace AreaAnalysis.Classes
             go.EnableUnselectObjectsOnExit(false);
             go.DeselectAllBeforePostSelect = false;
 
-            bool bHavePreselectedObjects = false;
+
+            //deselect invalid objects before post selection
+            var selectedObjs = doc.Objects.GetSelectedObjects(true,true);
+            foreach (var obj in selectedObjs)
+            {
+                if (obj.ObjectType == ObjectType.Light ||
+                    obj.ObjectType == ObjectType.Grip ||
+                    obj.ObjectType == ObjectType.Phantom )
+                {
+                    obj.Select(false);
+                }
+            }
+            doc.Views.Redraw();
 
             while (true)
             {
@@ -46,7 +69,6 @@ namespace AreaAnalysis.Classes
 
                 if (go.ObjectsWerePreselected)
                 {
-                    bHavePreselectedObjects = true;
                     go.EnablePreSelect(false, true);
                     continue;
                 }
@@ -54,20 +76,24 @@ namespace AreaAnalysis.Classes
                 break;
             }
 
-            if (bHavePreselectedObjects)
-            {
-                for (int i = 0; i < go.ObjectCount; i++)
-                {
-                    RhinoObject rhinoObject = go.Object(i).Object();
-                    if (null != rhinoObject)
-                        rhinoObject.Select(false);
-                }
 
-                RhinoDoc.ActiveDoc.Views.Redraw();
+            //make sure objects are selected at end of command
+            foreach (var obj in go.Objects())
+            {
+                obj.Object().Select(true);
             }
+
+            doc.Views.Redraw();
 
             return (Result.Success, go.Objects());
 
         }
+
+        public static void CreateBlock(ObjRef[] objects)
+        {
+            Rhino.Geometry.Point3d basePoint3d;
+
+        }
+
     }
 }

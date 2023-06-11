@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino;
+using Rhino.DocObjects;
 
 namespace AreaAnalysis.Classes
 {
@@ -75,10 +76,15 @@ namespace AreaAnalysis.Classes
 
         }
 
-        public void SetLink(int rowIndex)
+        public void SetLinkStatus(int rowIndex)
         {
             string linkKey = RowCell.GetLinkColumnText();
             _dTable[rowIndex][linkKey].EnableLink();
+        }
+
+        public void SetLinkObject(ObjRef[] objects)
+        {
+
         }
 
         public void RenameHeader(string oldName, string newName, GridColumn column, int index)
@@ -98,6 +104,8 @@ namespace AreaAnalysis.Classes
                 _gView.Columns.Insert(index, gCol);
             }
         }
+
+
 
         // public helper functions ===============================
 

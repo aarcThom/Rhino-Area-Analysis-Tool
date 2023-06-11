@@ -99,7 +99,7 @@ namespace AreaAnalysis.Classes
                         RhinoApp.WriteLine(obj.ObjectId.ToString());
                     }
 
-                    tControl.SetLink(rowIndex);
+                    tControl.SetLinkStatus(rowIndex);
                 }
             }
             else
