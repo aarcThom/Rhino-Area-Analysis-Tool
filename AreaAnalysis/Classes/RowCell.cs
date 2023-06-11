@@ -162,6 +162,11 @@ namespace AreaAnalysis.Classes
             return _stringVal == _defaultStringVal;
         }
 
+        public static string ReturnDefaultStringValue()
+        {
+            return _defaultStringVal;
+        }
+
         public void EnableLink()
         {
             if (_cellType == typeof(bool))
@@ -187,6 +192,8 @@ namespace AreaAnalysis.Classes
             return (fieldNames, fieldDescriptions, fieldTypes);
         }
 
+        // PRIVATE METHODS ===================================================================================
+        
 
     }
 }

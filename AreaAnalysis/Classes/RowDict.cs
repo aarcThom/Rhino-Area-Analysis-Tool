@@ -17,7 +17,7 @@ namespace AreaAnalysis.Classes
         private static readonly Dictionary<string, RowCell> MasterDictionary = new Dictionary<string, RowCell>(); 
 
         // name value for special name column & column name
-        public static string NameHeaderText = "Name";
+        public static string NameHeader = "Name";
 
 
         // Event handlers ==========================================================================

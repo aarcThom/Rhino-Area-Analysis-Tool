@@ -34,6 +34,7 @@ using MouseButtons = Eto.Forms.MouseButtons;
 using MouseEventArgs = Eto.Forms.MouseEventArgs;
 using Padding = Eto.Drawing.Padding;
 using Panel = Eto.Forms.Panel;
+using PropertyChangedEventArgs = System.ComponentModel.PropertyChangedEventArgs;
 using TableCell = AreaAnalysis.Classes.RowCell;
 
 namespace AreaAnalysis.Views
@@ -96,6 +97,8 @@ namespace AreaAnalysis.Views
             // room table events--------------------------------------------------------------------
             // handle clicks on room table
 
+
+
             //format the cells so link symbols are red and green
             gridView.CellFormatting += (sender, e) =>
             {
@@ -119,19 +122,12 @@ namespace AreaAnalysis.Views
                 e.BackgroundColor = (e.Row % 2 == 0)? Color.Parse("#ccecff") : Colors.White;
             };
 
-            gridView.SelectedRowsChanged += (sender, e) =>
-            {
-                foreach (var row in gridView.SelectedRows)
-                {
-                    RhinoApp.WriteLine(row.ToString());
-                }
-            };
 
 
             //column context
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
-                if (e.Column.HeaderText != RowCell.GetLinkColumnText() && e.Column.HeaderText != RowDict.NameHeaderText)
+                if (e.Column.HeaderText != RowCell.GetLinkColumnText() && e.Column.HeaderText != RowDict.NameHeader)
                 {
                     EtoFunctions.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
                 }
@@ -143,7 +139,7 @@ namespace AreaAnalysis.Views
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
                                                         && e.Column >= 0 && e.Row >= 0 
                                                         && e.GridColumn.HeaderText != RowCell.GetLinkColumnText()
-                                                        && e.GridColumn.HeaderText !=RowDict.NameHeaderText)
+                                                        && e.GridColumn.HeaderText !=RowDict.NameHeader)
                 {
                     EtoFunctions.CellRightClick(sender, e, this, tableController);
                 }
@@ -159,6 +155,62 @@ namespace AreaAnalysis.Views
                 }
             };
 
+
+            //ensuring unique names for the name column
+            gridView.CellEditing += (sender, e) =>
+            {
+                if (e.GridColumn.HeaderText == RowDict.NameHeader)
+                {
+                    RowDict cell = e.Item as RowDict;
+                    RowCell nameCell = cell[RowDict.NameHeader];
+
+                    List<string> nbrNames = tableController.GetAllRowNames();
+
+                    if (cell != null)
+                    {
+                        string tempName = nameCell.CellValue;
+
+                        PropertyChangedEventHandler propertyChangedHandler = null;
+                        propertyChangedHandler = (cellSender, args) =>
+                        {
+                            cell[RowDict.NameHeader].PropertyChanged -= propertyChangedHandler;
+                            if (nameCell.CheckForDefaultName() || nbrNames.Contains(nameCell.CellValue))
+                            {
+                                WarningMessageModal warning =
+                                    new WarningMessageModal(
+                                        $"You must provide a unique and not '{RowCell.ReturnDefaultStringValue()}' name",
+                                        "Non-valid name");
+                                warning.ShowModal(this);
+                                nameCell.CellValue = tempName;
+                            }
+                        };
+
+                        cell[RowDict.NameHeader].PropertyChanged += propertyChangedHandler;
+                    }
+                }
+            };
+
+
+            /*
+             * 
+                RhinoApp.WriteLine(_tempName);
+                var nbrCells = tableController.GetAllRowNames();
+
+                RowDict cell = e.Item as RowDict;
+                string newName = cell[RowDict.NameHeader].CellValue;
+                RhinoApp.WriteLine(newName);
+
+
+                if (nbrCells.Contains(newName) || newName == RowCell.ReturnDefaultStringValue())
+                {
+                    cell[RowDict.NameHeader].CellValue = _tempName;
+
+                    WarningMessageModal warning =
+                        new WarningMessageModal("You must choose a unique name for each row",
+                            "non-unique name");
+                    warning.ShowModal(this);
+                }
+            */
 
             //TEST BUTTON ==============================================================================================================
 

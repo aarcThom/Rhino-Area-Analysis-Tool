@@ -89,10 +89,17 @@ namespace AreaAnalysis.Classes
 
         }
 
-        public static void CreateBlock(ObjRef[] objects)
+        public static Result CreateBlock(ObjRef[] objects, string blockName)
         {
+            // set block base point
             Rhino.Geometry.Point3d basePoint3d;
+            var rc = Rhino.Input.RhinoGet.GetPoint("Block base point", false, out basePoint3d);
+            if (rc != Result.Success)
+            {
+                return rc;
+            }
 
+            return Result.Success;
         }
 
     }

@@ -32,7 +32,7 @@ namespace AreaAnalysis.Classes
         public void InitializeGridView()
         {
             _dTable.Add(new RowDict());
-            AddColumnPrivate(RowDict.NameHeaderText, typeof(string));
+            AddColumnPrivate(RowDict.NameHeader, typeof(string));
             AddColumnPrivate(RowCell.GetLinkColumnText(), typeof(bool));
         }
 
@@ -116,7 +116,19 @@ namespace AreaAnalysis.Classes
 
         public bool RowUnnamed(int index)
         {
-            return _dTable[index][RowDict.NameHeaderText].CheckForDefaultName();
+            return _dTable[index][RowDict.NameHeader].CheckForDefaultName();
+        }
+
+        public List<string> GetAllRowNames()
+        {
+            List<string> allNames = new List<string>();
+
+            foreach (RowDict row in _dTable)
+            {
+                allNames.Add(row[RowDict.NameHeader].CellValue);
+            }
+
+            return allNames;
         }
 
         // PRIVATE METHODS =======================================================================================
