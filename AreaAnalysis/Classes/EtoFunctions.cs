@@ -82,26 +82,27 @@ namespace AreaAnalysis.Classes
         }
 
         public static void LinkRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
-            TableController tControl)
+            TableController tControl, RhinoDoc doc)
         {
             GridView gView = sender as GridView;
 
             int rowIndex = args.Row;
 
+            RowDict row = args.Item as RowDict;
+            string blockName = row[RowDict.NameHeader].CellValue;
+
             if (!tControl.RowUnnamed(rowIndex))
             {
-                (Result result, ObjRef[] objects) = RhinoFunctions.UserSelect();
-
-                if (result == Result.Success)
+                (Result selectResult, ObjRef[] objects) = RhinoFunctions.UserSelect(doc);
+                if (selectResult == Result.Success)
                 {
-                    foreach (var obj in objects)
-                    {
-                        RhinoApp.WriteLine(obj.ObjectId.ToString());
-                    }
+                   Result blockResult = RhinoFunctions.CreateBlock(objects, blockName, doc);
 
-                    tControl.SetLinkStatus(rowIndex);
+                   if (blockResult == Result.Success) tControl.SetLinkStatus(rowIndex);
                 }
+                
             }
+
             else
             {
                 WarningMessageModal warning =

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,8 @@ namespace AreaAnalysis.Classes
 {
     public class RhinoFunctions
     {
-        public static (Result, ObjRef[]) UserSelect()
+        public static (Result, ObjRef[]) UserSelect(RhinoDoc doc)
         {
-            RhinoDoc doc = RhinoDoc.ActiveDoc;
 
             // Phantoms, grips, lights, etc., cannot be in blocks.
             const ObjectType forbiddenGeoFilter = ObjectType.Light |
@@ -39,7 +39,7 @@ namespace AreaAnalysis.Classes
 
 
             //deselect invalid objects before post selection
-            var selectedObjs = doc.Objects.GetSelectedObjects(true,true);
+            var selectedObjs =  doc.Objects.GetSelectedObjects(true,true);
             foreach (var obj in selectedObjs)
             {
                 if (obj.ObjectType == ObjectType.Light ||
@@ -89,15 +89,57 @@ namespace AreaAnalysis.Classes
 
         }
 
-        public static Result CreateBlock(ObjRef[] objects, string blockName)
+        public static Result CreateBlock(ObjRef[] objects, string blockName, RhinoDoc doc)
         {
+
             // set block base point
-            Rhino.Geometry.Point3d basePoint3d;
-            var rc = Rhino.Input.RhinoGet.GetPoint("Block base point", false, out basePoint3d);
+            Point3d basePoint3d;
+            var rc = RhinoGet.GetPoint("Block base point", false, out basePoint3d);
             if (rc != Result.Success)
             {
                 return rc;
             }
+
+            // See if block name already exists
+            InstanceDefinition existingIdef = doc.InstanceDefinitions.Find(blockName);
+            if (existingIdef != null)
+            {
+                RhinoApp.WriteLine($"Block definition {blockName} already exists. " +
+                                         "Please rename your column or delete the existing block of the same name");
+                return Result.Nothing;
+            }
+
+            // Gather all of the selected objects
+            var geometry = new List<GeometryBase>();
+            var attributes = new List<ObjectAttributes>();
+            foreach (var obj in objects)
+            {
+                if (obj != null)
+                {
+                    geometry.Add(obj.Object().Geometry);
+                    attributes.Add(obj.Object().Attributes);
+                }
+            }
+            // Gather all of the selected objects
+            int idefIndex = doc.InstanceDefinitions.Add(blockName, string.Empty, basePoint3d, geometry, attributes);
+
+            if (idefIndex < 0)
+            {
+                RhinoApp.WriteLine("Unable to create block definition", blockName);
+                return Result.Failure;
+            }
+
+            // Create a block instance
+            Transform t = Transform.Translation(basePoint3d.X,basePoint3d.Y,basePoint3d.Z);
+            doc.Objects.AddInstanceObject(idefIndex, t);
+
+            //delete the original geometry
+            foreach (var obj in objects)
+            {
+                doc.Objects.Delete(obj.ObjectId, true);
+            }
+
+            doc.Views.Redraw();
 
             return Result.Success;
         }

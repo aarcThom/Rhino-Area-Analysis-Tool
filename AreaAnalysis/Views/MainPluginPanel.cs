@@ -48,6 +48,8 @@ namespace AreaAnalysis.Views
         // Provide easy access to the SampleCsEtoPanel.GUID
         public static Guid PanelId => typeof(MainPluginPanel).GUID;
 
+        public RhinoDoc doc = RhinoDoc.ActiveDoc;
+
         public MainPluginPanel(uint documentSerialNumber)
         {
             //Rhino Panel Setup
@@ -123,7 +125,6 @@ namespace AreaAnalysis.Views
             };
 
 
-
             //column context
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
@@ -151,7 +152,7 @@ namespace AreaAnalysis.Views
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
                                                         && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkColumnText())
                 {
-                    EtoFunctions.LinkRightClick(sender, e, this, tableController);
+                    EtoFunctions.LinkRightClick(sender, e, this, tableController, doc);
                 }
             };
 
@@ -174,11 +175,18 @@ namespace AreaAnalysis.Views
                         propertyChangedHandler = (cellSender, args) =>
                         {
                             cell[RowDict.NameHeader].PropertyChanged -= propertyChangedHandler;
-                            if (nameCell.CheckForDefaultName() || nbrNames.Contains(nameCell.CellValue))
+
+                            string regexPat = @"^[\s\p{P}]+$";
+
+                            if (nameCell.CheckForDefaultName() 
+                                || nbrNames.Contains(nameCell.CellValue) 
+                                || Regex.IsMatch(nameCell.CellValue, regexPat ))
                             {
                                 WarningMessageModal warning =
                                     new WarningMessageModal(
-                                        $"You must provide a unique and not '{RowCell.ReturnDefaultStringValue()}' name",
+                                        "You must provide a unique, non empty and not '" +
+                                        $"{RowCell.ReturnDefaultStringValue()}' name that does not " +
+                                        "consists only of special characters",
                                         "Non-valid name");
                                 warning.ShowModal(this);
                                 nameCell.CellValue = tempName;
@@ -189,28 +197,6 @@ namespace AreaAnalysis.Views
                     }
                 }
             };
-
-
-            /*
-             * 
-                RhinoApp.WriteLine(_tempName);
-                var nbrCells = tableController.GetAllRowNames();
-
-                RowDict cell = e.Item as RowDict;
-                string newName = cell[RowDict.NameHeader].CellValue;
-                RhinoApp.WriteLine(newName);
-
-
-                if (nbrCells.Contains(newName) || newName == RowCell.ReturnDefaultStringValue())
-                {
-                    cell[RowDict.NameHeader].CellValue = _tempName;
-
-                    WarningMessageModal warning =
-                        new WarningMessageModal("You must choose a unique name for each row",
-                            "non-unique name");
-                    warning.ShowModal(this);
-                }
-            */
 
             //TEST BUTTON ==============================================================================================================
 
