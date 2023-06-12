@@ -33,7 +33,8 @@ namespace AreaAnalysis.Classes
         {
             _dTable.Add(new RowDict());
             AddColumnPrivate(RowDict.NameHeader, typeof(string));
-            AddColumnPrivate(RowCell.GetLinkColumnText(), typeof(bool));
+            AddColumnPrivate(RowCell.GetLinkHeader(), typeof(bool));
+            AddColumnPrivate(RowDict.GuidHeader, typeof(Guid));
         }
 
         public void AddColumn()
@@ -78,13 +79,19 @@ namespace AreaAnalysis.Classes
 
         public void SetLinkStatus(int rowIndex)
         {
-            string linkKey = RowCell.GetLinkColumnText();
+            string linkKey = RowCell.GetLinkHeader();
             _dTable[rowIndex][linkKey].EnableLink();
         }
 
-        public void SetLinkObject(ObjRef[] objects)
+        public void SetLinkObject(int rowIndex, Guid blockId)
         {
+            _dTable[rowIndex][RowDict.GuidHeader].CellValue = blockId.ToString();
+        }
 
+        public void DeleteLinkObject(int rowIndex)
+        {
+            _dTable[rowIndex][RowDict.GuidHeader].CellValue = Guid.Empty.ToString();
+            _dTable[rowIndex][RowCell.GetLinkHeader()].DisableLink();
         }
 
         public void RenameHeader(string oldName, string newName, GridColumn column, int index)
@@ -131,6 +138,39 @@ namespace AreaAnalysis.Classes
             return allNames;
         }
 
+        public List<Guid> GetLinkedBlockGuids()
+        {
+            List<Guid> allGuids = new List<Guid>();
+
+            foreach (RowDict row in _dTable)
+            {
+                Guid rowGuid = Guid.Parse(row[RowDict.GuidHeader].CellValue);
+                if (rowGuid != Guid.Empty)
+                {
+                    allGuids.Add(rowGuid);
+                }
+            }
+            return allGuids;
+        }
+
+        public void RemoveLink(Guid blockGuid)
+        {
+            int rowIndex = GetRowIndexFromBlockGuid(blockGuid);
+            RowCell cellLinkStatus = _dTable[rowIndex][RowCell.GetLinkHeader()];
+            cellLinkStatus.DisableLink();
+
+            RowCell cellLinkGuid = _dTable[rowIndex][RowDict.GuidHeader];
+            cellLinkGuid.CellValue = Guid.Empty.ToString();
+        }
+
+
+        public GridView GetGridView()
+        {
+            return _gView;
+        }
+
+
+
         // PRIVATE METHODS =======================================================================================
 
         private void AddColumnPrivate(string colName, Type colType)
@@ -146,8 +186,11 @@ namespace AreaAnalysis.Classes
                     row.Add(colName, new RowCell(colType));
                 }
 
-                GridColumn gColumn = EtoFunctions.AddColumn(_gView, colName, colType);
-                _gView.Columns.Add(gColumn);
+                if (colType != typeof(Guid))
+                {
+                    GridColumn gColumn = EtoFunctions.AddColumn(_gView, colName, colType);
+                    _gView.Columns.Add(gColumn);
+                }
             }
         }
 
@@ -166,7 +209,7 @@ namespace AreaAnalysis.Classes
 
             if (chosenType == typeof(bool))
             {
-                return (RowCell.GetLinkColumnText(), chosenType);
+                return (RowCell.GetLinkHeader(), chosenType);
             }
             else if (userName != null)
             {
@@ -176,6 +219,19 @@ namespace AreaAnalysis.Classes
             {
                 return (null, null);
             }
+        }
+
+        private int GetRowIndexFromBlockGuid(Guid blockIndex)
+        {
+            foreach (var row in _dTable)
+            {
+                if (row[RowDict.GuidHeader].CellValue == blockIndex.ToString())
+                {
+                    return _dTable.IndexOf(row);
+                }
+            }
+
+            return -1;
         }
     }
 }

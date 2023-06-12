@@ -96,9 +96,15 @@ namespace AreaAnalysis.Classes
                 (Result selectResult, ObjRef[] objects) = RhinoFunctions.UserSelect(doc);
                 if (selectResult == Result.Success)
                 {
-                   Result blockResult = RhinoFunctions.CreateBlock(objects, blockName, doc);
+                   (Result blockResult, Guid blockGuid) = RhinoFunctions.CreateBlock(objects, blockName, doc);
 
-                   if (blockResult == Result.Success) tControl.SetLinkStatus(rowIndex);
+                   if (blockResult == Result.Success)
+                   {
+                       tControl.SetLinkStatus(rowIndex);
+                       tControl.SetLinkObject(rowIndex, blockGuid);
+
+                       RhinoFunctions.AddDeleteBlockEventHandler(tControl, doc);
+                   }
                 }
                 
             }

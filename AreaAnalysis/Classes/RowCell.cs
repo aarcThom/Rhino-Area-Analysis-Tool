@@ -18,13 +18,13 @@ namespace AreaAnalysis.Classes
         // GUID LINKAGE STUFF ==========================================================================
 
         //default fields and field values / descriptions for Modal
-        private bool _linkVal = false;
-        private static  readonly string LinkColText = "Link"; // change this to change the text for the Rhino link column header
+        private bool _linkStatus = false;
+        private static  readonly string LinkHeader = "Link"; // change this to change the text for the Rhino link column header
         public static readonly string UnLinkedSymbol = "❌";
         public static readonly string LinkedSymbol = "✔️";
 
         //Rhino link
-        private Guid _selectedBlock;
+        private Guid _selectedBlock = Guid.Empty;
 
         private static string _defaultStringVal = "undefined";
         private string _stringVal; // generic string default per object
@@ -37,7 +37,7 @@ namespace AreaAnalysis.Classes
         // lists for Modal - make sure you update these if you add new fields / column types
         private static readonly List<string> FieldNames = new List<string> 
         {   
-            // {LinkColText}   // for _linkVal -- added to list in GetColumns()
+            // {LinkHeader}   // for _linkStatus -- added to list in GetColumns()
             "String Column",   // for _stringVal
             "Integer Column", // for _intVal
             "Float Column"   // for _floatVal
@@ -45,7 +45,7 @@ namespace AreaAnalysis.Classes
 
         private static readonly List<string> FieldDescriptions = new List<string>
         {
-            "Establish a link with a Rhino object",  // for _linkVal
+            "Establish a link with a Rhino object",  // for _linkStatus
             "Define a string column",               // for _stringVal
             "Define an integer column",            //for _intVal
             "Define a float column"               // for _floatVal
@@ -53,7 +53,7 @@ namespace AreaAnalysis.Classes
 
         private static readonly List<Type> FieldTypes = new List<Type>
         {
-            typeof(bool),     // for _linkVal
+            typeof(bool),     // for _linkStatus
             typeof(string),  // for _stringVal
             typeof(int),    // for _intVal
             typeof(float)  // for _floatVal
@@ -82,8 +82,12 @@ namespace AreaAnalysis.Classes
         {
             if (_cellType == typeof(bool))
             {
-                if (_linkVal) return LinkedSymbol;
+                if (_linkStatus) return LinkedSymbol;
                 return UnLinkedSymbol;
+            }
+            else if (_cellType == typeof(Guid))
+            {
+                return _selectedBlock.ToString();
             }
             else if (_cellType == typeof(string))
             {
@@ -106,7 +110,14 @@ namespace AreaAnalysis.Classes
             {
                 //deny this change
                 // replace this with an event...maybe
-                RhinoApp.WriteLine("How did you even get to the point where you could edit this link manually?"); 
+                RhinoApp.WriteLine("How did you even get to the point where you could edit this link manually?");
+                OnPropertyChanged(nameof(CellValue));
+            }
+            else if (_cellType == typeof(Guid))
+            {
+                Guid.TryParse(value, out _selectedBlock);
+                OnPropertyChanged(nameof(CellValue));
+
             }
             else if (_cellType == typeof(string))
             {
@@ -152,9 +163,9 @@ namespace AreaAnalysis.Classes
             return _cellType;
         }
 
-        public static string GetLinkColumnText()
+        public static string GetLinkHeader()
         {
-            return LinkColText;
+            return LinkHeader;
         }
 
         public bool CheckForDefaultName()
@@ -171,7 +182,21 @@ namespace AreaAnalysis.Classes
         {
             if (_cellType == typeof(bool))
             {
-                _linkVal = true;
+                _linkStatus = true;
+                OnPropertyChanged(nameof(CellValue));
+
+            }
+            else
+            {
+                throw new Exception("You cannot set link value in non Rhino link cell");
+            }
+        }
+
+        public void DisableLink()
+        {
+            if (_cellType == typeof(bool))
+            {
+                _linkStatus = false;
                 OnPropertyChanged(nameof(CellValue));
 
             }
@@ -188,7 +213,7 @@ namespace AreaAnalysis.Classes
             List<string> fieldDescriptions = new List<string>(FieldDescriptions);
             List<Type> fieldTypes = new List<Type>(FieldTypes);
 
-            fieldNames.Insert(0, LinkColText);
+            fieldNames.Insert(0, LinkHeader);
             return (fieldNames, fieldDescriptions, fieldTypes);
         }
 

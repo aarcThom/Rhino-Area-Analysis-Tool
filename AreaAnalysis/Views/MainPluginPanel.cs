@@ -128,7 +128,7 @@ namespace AreaAnalysis.Views
             //column context
             gridView.ColumnHeaderRightClick += (sender, e) =>
             {
-                if (e.Column.HeaderText != RowCell.GetLinkColumnText() && e.Column.HeaderText != RowDict.NameHeader)
+                if (e.Column.HeaderText != RowCell.GetLinkHeader() && e.Column.HeaderText != RowDict.NameHeader)
                 {
                     EtoFunctions.HeaderRightClick(sender, e.Column, tableController, e.MouseArgs);
                 }
@@ -139,7 +139,7 @@ namespace AreaAnalysis.Views
             {
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
                                                         && e.Column >= 0 && e.Row >= 0 
-                                                        && e.GridColumn.HeaderText != RowCell.GetLinkColumnText()
+                                                        && e.GridColumn.HeaderText != RowCell.GetLinkHeader()
                                                         && e.GridColumn.HeaderText !=RowDict.NameHeader)
                 {
                     EtoFunctions.CellRightClick(sender, e, this, tableController);
@@ -150,7 +150,7 @@ namespace AreaAnalysis.Views
             gridView.CellClick += (sender, e) =>
             {
                 if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
-                                                        && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkColumnText())
+                                                        && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkHeader())
                 {
                     EtoFunctions.LinkRightClick(sender, e, this, tableController, doc);
                 }

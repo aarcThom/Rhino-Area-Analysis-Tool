@@ -56,7 +56,7 @@ namespace AreaAnalysis.Views
                 RhinoApp.WriteLine("whatever");
             };
 
-            if (headerName != RowCell.GetLinkColumnText()) // we can't rename the link status column
+            if (headerName != RowCell.GetLinkHeader()) // we can't rename the link status column
             {
                 Items.Add(renameCellsBut);
             }

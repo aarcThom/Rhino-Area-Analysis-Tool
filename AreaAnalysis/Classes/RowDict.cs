@@ -19,6 +19,8 @@ namespace AreaAnalysis.Classes
         // name value for special name column & column name
         public static string NameHeader = "Name";
 
+        //special name for the Rhino guid value
+        public static string GuidHeader = "Rhino GUID";
 
         // Event handlers ==========================================================================
         public event PropertyChangedEventHandler PropertyChanged;

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using AreaAnalysis.Views;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
@@ -23,7 +25,7 @@ namespace AreaAnalysis.Classes
 
             // Phantoms, grips, lights, etc., cannot be in blocks.
             const ObjectType forbiddenGeoFilter = ObjectType.Light |
-                                                  ObjectType.Grip | 
+                                                  ObjectType.Grip |
                                                   ObjectType.Phantom;
 
             const ObjectType geoFilter = forbiddenGeoFilter ^ ObjectType.AnyObject;
@@ -39,16 +41,17 @@ namespace AreaAnalysis.Classes
 
 
             //deselect invalid objects before post selection
-            var selectedObjs =  doc.Objects.GetSelectedObjects(true,true);
+            var selectedObjs = doc.Objects.GetSelectedObjects(true, true);
             foreach (var obj in selectedObjs)
             {
                 if (obj.ObjectType == ObjectType.Light ||
                     obj.ObjectType == ObjectType.Grip ||
-                    obj.ObjectType == ObjectType.Phantom )
+                    obj.ObjectType == ObjectType.Phantom)
                 {
                     obj.Select(false);
                 }
             }
+
             doc.Views.Redraw();
 
             while (true)
@@ -89,7 +92,7 @@ namespace AreaAnalysis.Classes
 
         }
 
-        public static Result CreateBlock(ObjRef[] objects, string blockName, RhinoDoc doc)
+        public static (Result, Guid) CreateBlock(ObjRef[] objects, string blockName, RhinoDoc doc)
         {
 
             // set block base point
@@ -97,7 +100,7 @@ namespace AreaAnalysis.Classes
             var rc = RhinoGet.GetPoint("Block base point", false, out basePoint3d);
             if (rc != Result.Success)
             {
-                return rc;
+                return (rc, Guid.Empty);
             }
 
             // See if block name already exists
@@ -105,8 +108,8 @@ namespace AreaAnalysis.Classes
             if (existingIdef != null)
             {
                 RhinoApp.WriteLine($"Block definition {blockName} already exists. " +
-                                         "Please rename your column or delete the existing block of the same name");
-                return Result.Nothing;
+                                   "Please rename your column or delete the existing block of the same name");
+                return (Result.Nothing, Guid.Empty);
             }
 
             // Gather all of the selected objects
@@ -120,18 +123,35 @@ namespace AreaAnalysis.Classes
                     attributes.Add(obj.Object().Attributes);
                 }
             }
+
             // Gather all of the selected objects
             int idefIndex = doc.InstanceDefinitions.Add(blockName, string.Empty, basePoint3d, geometry, attributes);
 
             if (idefIndex < 0)
             {
                 RhinoApp.WriteLine("Unable to create block definition", blockName);
-                return Result.Failure;
+                return (Result.Failure, Guid.Empty);
             }
 
+            // get the block defintion GUID
+            var blockDefinition = doc.InstanceDefinitions.Find(blockName);
+            Guid blockGuid = blockDefinition.Id;
+
             // Create a block instance
-            Transform t = Transform.Translation(basePoint3d.X,basePoint3d.Y,basePoint3d.Z);
-            doc.Objects.AddInstanceObject(idefIndex, t);
+            Transform t = Transform.Translation(basePoint3d.X, basePoint3d.Y, basePoint3d.Z);
+            Guid instanceGuid = doc.Objects.AddInstanceObject(idefIndex, t);
+
+            if (instanceGuid == Guid.Empty)
+            {
+                RhinoApp.WriteLine("Unable to place block instance", blockName);
+                return (Result.Failure, Guid.Empty);
+            }
+
+            ObjRef instanceObjRef = new ObjRef(doc, instanceGuid);
+            var instanceObject = instanceObjRef.Object();
+            instanceObject.Attributes.Name = blockName;
+
+
 
             //delete the original geometry
             foreach (var obj in objects)
@@ -141,7 +161,51 @@ namespace AreaAnalysis.Classes
 
             doc.Views.Redraw();
 
-            return Result.Success;
+            return (Result.Success, blockGuid);
+        }
+
+        public static void AddDeleteBlockEventHandler(TableController tControl, RhinoDoc doc)
+        {
+            RhinoDoc.DeleteRhinoObject += (sender, e) => RhinoBlockDeleted(sender, e, tControl, doc);
+        }
+
+
+        private static void RhinoBlockDeleted(Object sender, RhinoObjectEventArgs e, TableController tControl, RhinoDoc doc)
+        {
+
+
+            if (e.TheObject.ObjectType == ObjectType.InstanceReference)
+            {
+                InstanceObject obj = e.TheObject as InstanceObject;
+                InstanceDefinition block = obj.InstanceDefinition;
+                Transform objTrans = obj.InstanceXform;
+                int defIndex = block.Index;
+
+
+                //delete the block defintion if not in use
+                if (tControl.GetLinkedBlockGuids().Contains(block.Id) && !block.InUse(1))
+                {
+
+                    DeleteBlockDefModal modal = new DeleteBlockDefModal();
+                    modal.ShowModal(tControl.GetGridView());
+
+                    if (modal.getResult())
+                    {
+                        RhinoApp.WriteLine($"deleting block definition {block.Name}");
+                        int blockIx = block.Index;
+                        doc.InstanceDefinitions.Delete(blockIx, true, true);
+                        tControl.RemoveLink(block.Id);
+                    }
+                    else
+                    {
+                        //re-add the block instance and undo the block delete
+                        doc.Objects.AddInstanceObject(defIndex, objTrans);
+                        doc.Views.Redraw();
+                        doc.Undo();
+                        doc.Undo();
+                    }
+                }
+            }
         }
 
     }
