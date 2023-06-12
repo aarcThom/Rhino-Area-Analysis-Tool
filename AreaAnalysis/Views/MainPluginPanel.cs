@@ -137,24 +137,12 @@ namespace AreaAnalysis.Views
             //cell context for non-special rows
             gridView.CellClick += (sender, e) =>
             {
-                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
-                                                        && e.Column >= 0 && e.Row >= 0 
-                                                        && e.GridColumn.HeaderText != RowCell.GetLinkHeader()
-                                                        && e.GridColumn.HeaderText !=RowDict.NameHeader)
+                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None && e.Column >= 0 && e.Row >= 0)
                 {
-                    EtoFunctions.CellRightClick(sender, e, this, tableController);
+                    EtoFunctions.CellRightClick(sender, e, this, tableController, doc);
                 }
             };
 
-            //cell context for link
-            gridView.CellClick += (sender, e) =>
-            {
-                if (e.Buttons == MouseButtons.Alternate && e.Modifiers == Keys.None 
-                                                        && e.Row >= 0 && e.GridColumn.HeaderText == RowCell.GetLinkHeader())
-                {
-                    EtoFunctions.LinkRightClick(sender, e, this, tableController, doc);
-                }
-            };
 
 
             //ensuring unique names for the name column

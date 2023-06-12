@@ -32,7 +32,7 @@ namespace AreaAnalysis.Classes
 
             GetObject go = new GetObject();
             go.GeometryFilter = geoFilter;
-            go.SetCommandPrompt("Select stuff");
+            go.SetCommandPrompt("Select geometry to be formatted into a block");
             go.GroupSelect = true;
             go.SubObjectSelect = false;
             go.EnableClearObjectsOnEntry(false);
@@ -60,13 +60,13 @@ namespace AreaAnalysis.Classes
 
                 if (result == GetResult.Cancel)
                 {
-                    RhinoApp.WriteLine("user cancelled");
+                    RhinoApp.WriteLine("user cancelled block creation");
                     return (Result.Cancel, null);
                 }
 
                 if (result == GetResult.Nothing)
                 {
-                    RhinoApp.WriteLine("nothing selected");
+                    RhinoApp.WriteLine("nothing selected for block creation");
                     return (Result.Cancel, null);
                 }
 

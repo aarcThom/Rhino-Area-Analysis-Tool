@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
-using AreaAnalysis.Interfaces;
 using Eto.Forms;
 using Rhino;
 
@@ -204,6 +203,11 @@ namespace AreaAnalysis.Classes
             {
                 throw new Exception("You cannot set link value in non Rhino link cell");
             }
+        }
+
+        public bool GetLinkStatus()
+        {
+            return _linkStatus;
         }
 
         public static (List<string> ColumnNames, List<string> ColumnDescriptions, List<Type> ColumnTypes) GetColumns()

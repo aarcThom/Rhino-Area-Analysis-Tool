@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Rhino;
 using Rhino.DocObjects;
+using Rhino.Commands;
 
 namespace AreaAnalysis.Classes
 {
@@ -88,10 +89,14 @@ namespace AreaAnalysis.Classes
             _dTable[rowIndex][RowDict.GuidHeader].CellValue = blockId.ToString();
         }
 
-        public void DeleteLinkObject(int rowIndex)
+        public void RemoveLink(Guid blockGuid)
         {
-            _dTable[rowIndex][RowDict.GuidHeader].CellValue = Guid.Empty.ToString();
-            _dTable[rowIndex][RowCell.GetLinkHeader()].DisableLink();
+            int rowIndex = GetRowIndexFromBlockGuid(blockGuid);
+            RowCell cellLinkStatus = _dTable[rowIndex][RowCell.GetLinkHeader()];
+            cellLinkStatus.DisableLink();
+
+            RowCell cellLinkGuid = _dTable[rowIndex][RowDict.GuidHeader];
+            cellLinkGuid.CellValue = Guid.Empty.ToString();
         }
 
         public void RenameHeader(string oldName, string newName, GridColumn column, int index)
@@ -112,6 +117,41 @@ namespace AreaAnalysis.Classes
             }
         }
 
+        public void AddBlockLink(int rowIndex, RhinoDoc doc)
+        {
+
+            RowDict row = _dTable[rowIndex];
+            string blockName = row[RowDict.NameHeader].CellValue;
+
+            if (!RowUnnamed(rowIndex))
+            {
+                (Result selectResult, ObjRef[] objects) = RhinoFunctions.UserSelect(doc);
+                if (selectResult == Result.Success)
+                {
+                    (Result blockResult, Guid blockGuid) = RhinoFunctions.CreateBlock(objects, blockName, doc);
+
+                    if (blockResult == Result.Success)
+                    {
+                        SetLinkStatus(rowIndex);
+                        SetLinkObject(rowIndex, blockGuid);
+
+                        RhinoFunctions.AddDeleteBlockEventHandler(this, doc);
+                    }
+                }
+
+            }
+
+            else
+            {
+                WarningMessageModal warning =
+                    new WarningMessageModal("You must name the row before linking it",
+                        "Undefined row name");
+                warning.ShowModal(_gView);
+            }
+
+
+        }
+
 
 
         // public helper functions ===============================
@@ -119,6 +159,11 @@ namespace AreaAnalysis.Classes
         public int GetRowIndex(RowDict row)
         {
             return _dTable.IndexOf(row);
+        }
+
+        public RowDict GetRowFromIndex(int index)
+        {
+            return _dTable[index];
         }
 
         public bool RowUnnamed(int index)
@@ -152,17 +197,6 @@ namespace AreaAnalysis.Classes
             }
             return allGuids;
         }
-
-        public void RemoveLink(Guid blockGuid)
-        {
-            int rowIndex = GetRowIndexFromBlockGuid(blockGuid);
-            RowCell cellLinkStatus = _dTable[rowIndex][RowCell.GetLinkHeader()];
-            cellLinkStatus.DisableLink();
-
-            RowCell cellLinkGuid = _dTable[rowIndex][RowDict.GuidHeader];
-            cellLinkGuid.CellValue = Guid.Empty.ToString();
-        }
-
 
         public GridView GetGridView()
         {

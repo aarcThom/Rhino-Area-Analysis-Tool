@@ -57,7 +57,7 @@ namespace AreaAnalysis.Classes
         }
 
         public static void CellRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
-            TableController tControl)
+            TableController tControl, RhinoDoc doc)
         {
             GridView gView = sender as GridView; 
 
@@ -77,47 +77,8 @@ namespace AreaAnalysis.Classes
                 selectedRowIndices.Add(args.Row);
             }
 
-            CellContext cMenu = new CellContext(selectedRowIndices, args.Column, tControl, gView);
+            CellContext cMenu = new CellContext(selectedRowIndices, args.Column, tControl, gView, doc);
             cMenu.Show(gView, args.Location);
-        }
-
-        public static void LinkRightClick(object sender, GridCellMouseEventArgs args, Control mainPanel,
-            TableController tControl, RhinoDoc doc)
-        {
-            GridView gView = sender as GridView;
-
-            int rowIndex = args.Row;
-
-            RowDict row = args.Item as RowDict;
-            string blockName = row[RowDict.NameHeader].CellValue;
-
-            if (!tControl.RowUnnamed(rowIndex))
-            {
-                (Result selectResult, ObjRef[] objects) = RhinoFunctions.UserSelect(doc);
-                if (selectResult == Result.Success)
-                {
-                   (Result blockResult, Guid blockGuid) = RhinoFunctions.CreateBlock(objects, blockName, doc);
-
-                   if (blockResult == Result.Success)
-                   {
-                       tControl.SetLinkStatus(rowIndex);
-                       tControl.SetLinkObject(rowIndex, blockGuid);
-
-                       RhinoFunctions.AddDeleteBlockEventHandler(tControl, doc);
-                   }
-                }
-                
-            }
-
-            else
-            {
-                WarningMessageModal warning =
-                    new WarningMessageModal("You must name the row before linking it",
-                        "Undefined row name");
-                warning.ShowModal(gView);
-            }
-            
-            
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using AreaAnalysis.Classes;
@@ -12,10 +13,11 @@ namespace AreaAnalysis.Views
 {
     public class CellContext : ContextMenu
     { 
-        public CellContext(List<int> selectedRows, int selectedColumn, TableController tController, GridView gView)
+        public CellContext(List<int> selectedRows, int selectedColumn, TableController tController, GridView gView, RhinoDoc doc)
         {
             int rowCount = selectedRows.Count();
-
+            
+            // FOR ALL COLUMNS===================================================================
             //delete Row Button
              ButtonMenuItem deleteRowBut = new ButtonMenuItem();
              
@@ -28,7 +30,7 @@ namespace AreaAnalysis.Views
                 deleteRowBut.Text = "Delete selected " + rowCount.ToString() + " rows";
             }
 
-
+            
             deleteRowBut.Click += (sender, e) =>
             {
                 tController.DeleteRow(selectedRows);
@@ -36,31 +38,65 @@ namespace AreaAnalysis.Views
 
             Items.Add(deleteRowBut);
 
-            // rename cells button
-            ButtonMenuItem renameCellsBut = new ButtonMenuItem();
 
-            string headerName = gView.Columns[selectedColumn].HeaderText;
+            string colHeaderName = gView.Columns[selectedColumn].HeaderText;
+            
 
-            if (rowCount == 1)
-            {
-                renameCellsBut.Text = "Change selected cell value in column '" + headerName + "'";
-            }
-            else if (rowCount > 1)
-            {
-                renameCellsBut.Text = "Change selected cell values for " + rowCount.ToString() + 
-                                   " selected rows in column '" + headerName + "'";
-            }
+            //FOR NON-SPECIAL COLUMNS
 
-            renameCellsBut.Click += (sender, e) =>
+            if (colHeaderName != RowCell.GetLinkHeader() && colHeaderName != RowDict.NameHeader) // we can't rename the link status column
             {
-                RhinoApp.WriteLine("whatever");
-            };
 
-            if (headerName != RowCell.GetLinkHeader()) // we can't rename the link status column
-            {
+                // rename cells button
+                ButtonMenuItem renameCellsBut = new ButtonMenuItem();
+
+                if (rowCount == 1)
+                {
+                    renameCellsBut.Text = "Change selected cell value in column '" + colHeaderName + "'";
+                }
+                else if (rowCount > 1)
+                {
+                    renameCellsBut.Text = "Change selected cell values for " + rowCount.ToString() +
+                                          " selected rows in column '" + colHeaderName + "'";
+                }
+
+                renameCellsBut.Click += (sender, e) =>
+                {
+                    RhinoApp.WriteLine("whatever");
+                };
+
                 Items.Add(renameCellsBut);
             }
-            
+
+            //FOR THE LINK COLUMN
+            string rowName = tController.GetAllRowNames()[selectedRows[0]];
+            if (colHeaderName == RowCell.GetLinkHeader() && rowCount == 1)
+            {
+                // row has no link yet
+                if (!tController.GetRowFromIndex(selectedRows[0])[RowCell.GetLinkHeader()].GetLinkStatus())
+                {
+                    // LinkButton
+                    ButtonMenuItem linkBlockBut = new ButtonMenuItem();
+                    linkBlockBut.Text = "Link Rhino geometry to this row";
+
+                    linkBlockBut.Click += (sender, e) =>
+                    {
+                        tController.AddBlockLink(selectedRows[0], doc);
+                    };
+
+
+                    Items.Add(linkBlockBut);
+                }
+                
+
+            }
+
+
+
+
+
+
+
         }
     } 
 }
